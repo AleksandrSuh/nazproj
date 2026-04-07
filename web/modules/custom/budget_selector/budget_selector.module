@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Budget Selector module.
+ */
+
+/**
+ * Implements hook_form_alter().
+ */
+function budget_selector_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  // Проверяем, что это форма редактирования материала "Мероприятие"
+  if (strpos($form_id, 'node_meropriyatie_edit_form') !== false ||
+    strpos($form_id, 'node_meropriyatie_form') !== false) {
+
+    // Добавляем JS прямо через drupalSettings
+    $form['#attached']['library'][] = 'budget_selector/admin';
+
+    // Для отладки
+    $form['#attached']['drupalSettings']['budget_selector_debug'] = TRUE;
+  }
+}

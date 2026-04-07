@@ -1,0 +1,3 @@
+services:
+  budget_import.budget_data_service:
+    class: Drupal\budget_import\Service\BudgetDataService

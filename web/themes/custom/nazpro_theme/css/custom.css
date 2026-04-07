@@ -1,0 +1,53 @@
+.zag-chart {
+	max-width: 1000px;
+}
+.slider-track .slide-chart-photo img {
+	max-width: 100px;
+	max-height: 100px;
+}
+.material-object span a {display: block;color: #3E3E3E;text-decoration: none;}
+.material-object span:hover a {color:#ffffff;}
+
+.contract-object span a {display: block;color: #ffffff;text-decoration: none;}
+.contract-object span:hover a {color:var(--housing-bg);}
+
+#breadcrumbs span.breadcrumbs_end {
+	border: none;
+	color: #787878;
+}
+
+.one-project-gl:nth-child(8){background:url('../img/project-gl-1.png') no-repeat right 30px center var(--demographics-bg);}
+.one-project-gl:nth-child(9){background:url('../img/project-gl-2.png') no-repeat right 30px center var(--kultura-bg);}
+.one-project-gl:nth-child(10){background:url('../img/project-gl-3.png') no-repeat right 30px center var(--housing-bg);}
+.one-project-gl:nth-child(11){background:url('../img/project-gl-4.png') no-repeat right 30px center var(--eco-bg);}
+.one-project-gl:nth-child(12){background:url('../img/project-gl-5.png') no-repeat right 30px center var(--roads-bg);}
+.one-project-gl:nth-child(13){background:url('../img/project-gl-1.png') no-repeat right 30px center #64bde1;}
+.one-project-gl:nth-child(14){background:url('../img/project-gl-3.png') no-repeat right 30px center #208076;}
+
+.phone1 {
+	position: absolute;
+	left: -99999px;
+	display: none;
+}
+.form_thank {
+	display: none;
+}
+.zag-block-gl-edit {
+    z-index: 9;
+    position: relative;
+}
+a.slide-gl {
+	text-decoration: none;
+}
+.but-login {
+	text-decoration: none;
+}
+.img_hidden {
+	display: none;
+}
+img {
+	max-width: 100%;
+}
+.oic-news-vn img {
+	width: 525px;
+}

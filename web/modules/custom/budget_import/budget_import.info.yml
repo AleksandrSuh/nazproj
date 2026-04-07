@@ -1,0 +1,5 @@
+name: 'Импорт бюджета'
+type: module
+description: 'Импорт данных бюджета из файла xlsx'
+core_version_requirement: ^11
+package: Custom

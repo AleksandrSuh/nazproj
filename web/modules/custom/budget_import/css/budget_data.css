@@ -1,0 +1,55 @@
+.budget-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.budget-data-table th {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-weight: bold;
+}
+
+.budget-data-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.budget-data-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.budget-data-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.budget-filter-form {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+}
+
+.budget-filter-form select,
+.budget-filter-form input[type="submit"] {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.budget-filter-form .button {
+  display: inline-block;
+  padding: 5px 15px;
+  background-color: #0074bd;
+  color: white;
+  text-decoration: none;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+}
+
+.budget-filter-form .button:hover {
+  background-color: #005c9e;
+}

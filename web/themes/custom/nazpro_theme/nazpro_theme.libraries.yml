@@ -1,0 +1,19 @@
+head-styles-scripts:
+  css:
+    theme:
+      css/swiper-bundle.min.css: {}
+      css/style.css: {}
+      css/jquery.mCustomScrollbar.css: {}
+      css/custom.css: {}
+      js/source/jquery.fancybox.css: {}
+  js:
+    js/jquery-1.7.2.min.js: {}
+    https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=6eb1a292-abb6-45b7-971b-92bc30affd62: { external: true }
+    js/slider-chart.js: {}
+    js/swiper-bundle.min.js: {}
+    js/jquery.mCustomScrollbar.js: {}
+    js/main.js: {}
+    js/source/jquery.fancybox.js: {}
+    js/main_custom.js: {}
+  dependencies:
+    - core/drupal

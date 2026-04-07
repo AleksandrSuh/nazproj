@@ -1,0 +1,41 @@
+# Composer
+/vendor/
+/composer.phar
+
+# Drupal core и contrib (устанавливаются Composer'ом)
+/web/core/
+/web/modules/contrib/
+/web/themes/contrib/
+/web/profiles/contrib/
+/web/libraries/
+/web/sites/default/settings.php
+/web/sites/default/settings.local.php
+
+# Файлы конфигурации Drupal (если используется config_sync)
+/config/*/active/
+/config/*/staging/
+/config/sync/.htaccess
+
+# Файлы среды и временные файлы
+.env
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+
+# Логи и кэш
+/web/sites/*/files/
+/web/sites/*/tmp/
+/web/sites/*/private/
+*.log
+
+# Drush
+/drush/contrib/
+/drush/sites/*/drushrc.yml
+
+# Другое
+/.ddev/
+/.tugboat/
+/build/
+
+comm.txt

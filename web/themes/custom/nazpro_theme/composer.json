@@ -1,0 +1,9 @@
+{
+    "name": "custom/nazpro_theme",
+    "type": "drupal-custom-theme",
+    "description": "Custom theme for D11",
+    "version": "1.0.0",
+    "require": {
+        "drupal/core": "^11"
+    }
+}

@@ -1,0 +1,12 @@
+name: 'Национальные проекты'
+type: theme
+description: 'Тема национальных проектов г. Екатеринбург'
+core_version_requirement: ^11
+base theme: false
+libraries:
+  - nazpro_theme/head-styles-scripts
+regions:
+  header_chart: 'Header_chart'
+  content: 'Content'
+  sidebar: 'Sidebar'
+  footer: 'Footer'

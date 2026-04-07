@@ -1,0 +1,8 @@
+name: 'Budget представление'
+type: module
+description: 'Обеспечивает интеграцию представлений для таблицы budget, позволяет добавить связку мероприятий и строк бюджета'
+core_version_requirement: ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:views
+  - views_database_connector:views_database_connector

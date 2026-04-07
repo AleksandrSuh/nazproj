@@ -1,0 +1,156 @@
+<?php
+
+/**
+ * @file
+ * Install file for Budget Import module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function budget_import_schema() {
+  $schema['budget'] = [
+    'description' => 'Budget data imported from Bitrix',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key',
+      ],
+      'category_code' => [
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'description' => 'Category code from Bitrix (IE_NAME)',
+      ],
+      'xml_id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unique' => TRUE,
+        'description' => 'Bitrix element ID (IE_ID)',
+      ],
+      'active' => [
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 1,
+        'description' => 'Active status (IE_ACTIVE): 1 for Y, 0 for N',
+      ],
+      'dop_fk' => [
+        'type' => 'varchar',
+        'length' => 10,
+        'description' => 'Additional foreign key (IP_PROP7)',
+      ],
+      'extence_plan' => [
+        'type' => 'numeric',
+        'precision' => 20,
+        'scale' => 2,
+        'description' => 'Extence plan (IP_PROP8)',
+      ],
+      'extence_fed_plan' => [
+        'type' => 'numeric',
+        'precision' => 20,
+        'scale' => 2,
+        'description' => 'Extence federal plan (IP_PROP9)',
+      ],
+      'extence_reg_plan' => [
+        'type' => 'numeric',
+        'precision' => 20,
+        'scale' => 2,
+        'description' => 'Extence regional plan (IP_PROP10)',
+      ],
+      'extence_mun_plan' => [
+        'type' => 'numeric',
+        'precision' => 20,
+        'scale' => 2,
+        'description' => 'Extence municipal plan (IP_PROP11)',
+      ],
+      'income_fact' => [
+        'type' => 'numeric',
+        'precision' => 20,
+        'scale' => 2,
+        'description' => 'Income fact (IP_PROP12)',
+      ],
+      'income_fed_fact' => [
+        'type' => 'numeric',
+        'precision' => 20,
+        'scale' => 2,
+        'description' => 'Income federal fact (IP_PROP13)',
+      ],
+      'income_reg_fact' => [
+        'type' => 'numeric',
+        'precision' => 20,
+        'scale' => 2,
+        'description' => 'Income regional fact (IP_PROP14)',
+      ],
+      'income_mun_fact' => [
+        'type' => 'numeric',
+        'precision' => 20,
+        'scale' => 2,
+        'description' => 'Income municipal fact (IP_PROP15)',
+      ],
+      'year' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'Year (IC_GROUP0)',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'description' => 'User ID who imported/updated the record',
+      ],
+      'created_at' => [
+        'type' => 'timestamp',
+        'pgsql_type' => 'timestamp without time zone',
+        'not null' => TRUE,
+        'description' => 'Created time',
+      ],
+      'updated_at' => [
+        'type' => 'timestamp',
+        'pgsql_type' => 'timestamp without time zone',
+        'not null' => TRUE,
+        'description' => 'Updated time',
+      ],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'budget_unique' => ['category_code', 'dop_fk', 'year'],
+      'xml_id_unique' => ['xml_id'],
+    ],
+    'indexes' => [
+      'budget_year' => ['year'],
+      'budget_category' => ['category_code'],
+      'budget_dop_fk' => ['dop_fk'],
+      'budget_active' => ['active'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function budget_import_install() {
+  // Добавляем триггер для автоматического обновления updated_at
+  $database = \Drupal::database();
+
+  // Создаем функцию для обновления updated_at
+  $database->query("
+    CREATE OR REPLACE FUNCTION update_updated_at_column()
+    RETURNS TRIGGER AS $$
+    BEGIN
+      NEW.updated_at = CURRENT_TIMESTAMP;
+      RETURN NEW;
+    END;
+    $$ language 'plpgsql';
+  ");
+
+  // Создаем триггер для таблицы budget
+  $database->query("
+    DROP TRIGGER IF EXISTS update_budget_updated_at ON budget;
+    CREATE TRIGGER update_budget_updated_at
+      BEFORE UPDATE ON budget
+      FOR EACH ROW
+      EXECUTE FUNCTION update_updated_at_column();
+  ");
+}

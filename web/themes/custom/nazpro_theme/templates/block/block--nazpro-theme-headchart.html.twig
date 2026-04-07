@@ -1,0 +1,64 @@
+<div class='one-chart-cart'>
+   <div class='left-chart'>
+          <div class='top-chart-cart'>
+            <div class="yars-chart-slider swiper">
+              <div class="swiper-wrapper">
+                {% for year, data in content %}
+                <div class='swiper-slide'><span>{{ year }}</span></div>
+                {% endfor %}
+              </div>
+              <div class="sw-button-prev"></div>
+              <div class="sw-button-next"></div>
+            </div>
+          </div>
+     {% for year, data in content %}
+       <div class='bottom-chart-cart null-chart'>
+         <div class='all-block-chart'>
+           <div class='charts-block-cart'>
+             <div class='one-chart'>
+               <div class='name-meaning-chart'><div class='name-chart'>Федеральный бюджет:</div><div class='meaning-chart'>{{ data.fed_plan }}</div></div>
+               <div class='chart'><span></span></div>
+             </div>
+             <div class='one-chart'>
+               <div class='name-meaning-chart'><div class='name-chart'>Региональный бюджет</div><div class='meaning-chart'>{{ data.reg_plan }}</div></div>
+               <div class='chart'><span></span></div>
+             </div>
+             <div class='one-chart'>
+               <div class='name-meaning-chart'><div class='name-chart'>Муниципальный бюджет</div><div class='meaning-chart'>{{ data.mun_plan }}</div></div>
+               <div class='chart'><span></span></div>
+             </div>
+           </div>
+           <div class='info-charts-cart'>
+             <table cellspacing='0' class='table-info-carts'>
+               <tr>
+                 <th>Бюджет</th>
+                 <th>План <span>(млн ₽)</span></th>
+                 <th>Факт <span>(млн ₽)</span></th>
+               </tr>
+               <tr>
+                 <td>Федеральный</td>
+                 <td class='plan'><span></span>{{ data.fed_plan }}</td>
+                 <td class='fakt'><span></span>{{ data.fed_fact }}</td>
+               </tr>
+               <tr>
+                 <td>Региональный</td>
+                 <td class='plan'><span></span>{{ data.reg_plan }}</td>
+                 <td class='fakt'><span></span>{{ data.reg_fact }}</td>
+               </tr>
+               <tr>
+                 <td>Муниципальный</td>
+                 <td class='plan'><span></span>{{ data.mun_plan }}</td>
+                 <td class='fakt'><span></span>{{ data.mun_fact }}</td>
+               </tr>
+               <tr>
+                 <td class='itog-chart'>Итого</td>
+                 <td class='itog-plan'>{{ data.itog_plan }}</td>
+                 <td class='itog-fakt'>{{ data.itog_fact }}</td>
+               </tr>
+             </table>
+           </div>
+         </div>
+       </div>
+     {% endfor %}
+   </div>
+</div>
