@@ -1,0 +1,35 @@
+{#
+Шаблон для вывода направлений в шапке
+Доступные переменные:
+- view: объект представления
+- rows: массив строк с нодами (если нужно)
+- header, footer, pager и т.д.
+#}
+
+{% set directions = view.result %}
+
+{% if directions %}
+  <section class='telo-nac'>
+  <article class='all-project-gl'>
+    {% for direction in directions %}
+      {% set node = direction._entity %}
+      {% set title = node.label() %}
+      {% set url = path('entity.node.canonical', {'node': node.id()}) %}
+      <article class='one-project-gl'>
+        <a href='{{ url }}'>
+          <span class='name-project-gl'>{{ title }}</span>
+          <span class='anons-project-gl'>{{ direction.podrazdely_count }} Региональных проекта</span>
+        </a>
+      </article>
+    {% endfor %}
+    {% set last_year = 'now'|date('Y') - 1 %}
+    {% set last_titl = 'Нацпроекты 2020-' ~ last_year %}
+      <article class='one-project-gl'>
+        <a href='/arch'>
+          <span class='name-project-gl'>{{ last_titl }}</span>
+          <span class='anons-project-gl'> </span>
+        </a>
+      </article>
+  </article>
+  </section>
+{% endif %}

@@ -16,6 +16,15 @@
 	color: #787878;
 }
 
+
+#eco{background-color:var(--eco-bg);}
+#kultura{background-color:var(--kultura-bg);}
+#node1{background-color:var(--housing-bg);}
+#node2{background-color:var(--demographics-bg);}
+#roads{background-color:var(--roads-bg);}
+#obrazovanie{background-color:var(--obrazovanie-bg);}
+
+
 .one-project-gl:nth-child(8){background:url('../img/project-gl-1.png') no-repeat right 30px center var(--demographics-bg);}
 .one-project-gl:nth-child(9){background:url('../img/project-gl-2.png') no-repeat right 30px center var(--kultura-bg);}
 .one-project-gl:nth-child(10){background:url('../img/project-gl-3.png') no-repeat right 30px center var(--housing-bg);}

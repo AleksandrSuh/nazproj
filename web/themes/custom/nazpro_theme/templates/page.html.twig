@@ -11,15 +11,8 @@
   </script>
 <div class='hid-menu'>
   <div class='telo-nac'>
-    <nav>
-      <ul>
-        <li><a href='/infrastruktura-dlya-zhizni/' class='one-menu-h'>Инфраструктура для жизни</a><div id='housing' class='hover-info'><img src='/{{ active_theme_path() }}/img/housing.jpg' alt='Инфраструктура для жизни'/></div></li>
-        <li><a href='/molodyezh-i-deti/' class='one-menu-h'>Молодёжь и дети</a><div id='demographics' class='hover-info'><img src='/{{ active_theme_path() }}/img/demographics.jpg' alt='Молодёжь и дети'/></div></li>
-        <li><a href='/semya/' class='one-menu-h'>Семья</a><div id='eco' class='hover-info'><img src='/{{ active_theme_path() }}/img/eco.jpg' alt='Семья'/></div></li>
-        <li><a href='/arch/' class='one-menu-h'>Нацпроекты 2020-2024</a><div id='roads' class='hover-info'><img src='/{{ active_theme_path() }}/img/roads.jpg' alt='Нацпроекты 2020-2024'/></div></li>
-      </ul>
-    </nav>
-    <a href="/authorization/" class="but-login">Войти</a>
+    {{ projects_header }}
+    <!--a href="/authorization/" class="but-login">Войти</a-->
   </div>
   <img src='/{{ active_theme_path() }}/img/no-menu.jpg' alt=''>
 </div>
@@ -49,18 +42,20 @@
       </div>
       {{ page.header_chart }}
     </div>
-
   </div>
 </section>
+{{ projects_front }}
 
-<section class='telo-nac'>
+<!--section class='telo-nac'>
 
-  <article class='all-project-gl'><article class='one-project-gl' id='bx_1847241719_32'>
+  <article class='all-project-gl'>
+    <article class='one-project-gl' id='bx_1847241719_32'>
       <a href='/infrastruktura-dlya-zhizni/'>
         <span class='name-project-gl'>Инфраструктура для жизни</span>
         <span class='anons-project-gl'>3 Региональных проекта</span>
       </a>
-    </article><article class='one-project-gl' id='bx_1847241719_37'>
+    </article>
+    <article class='one-project-gl' id='bx_1847241719_37'>
       <a href='/molodyezh-i-deti/'>
         <span class='name-project-gl'>Молодёжь и дети</span>
         <span class='anons-project-gl'>2 Региональных проекта</span>
@@ -76,7 +71,7 @@
       </a>
     </article>
   </article>
-</section>
+</section-->
 
 <section class='media-block'>
   <div class='telo-nac'>
