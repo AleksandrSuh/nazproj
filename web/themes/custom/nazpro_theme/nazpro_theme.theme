@@ -4,8 +4,9 @@
  * Implements hook_preprocess_html().
  */
 function nazpro_theme_preprocess_html(array &$variables) {
-  // Например, добавить класс к body
-  $variables['attributes']['class'][] = 'gl';
+  // добавить класс к body
+  $class = \Drupal::service('path.matcher')->isFrontPage() ? 'gl' : 'housing';
+  $variables['attributes']['class'][] = $class;
 }
 
 function nazpro_theme_preprocess_page(&$variables) {
@@ -15,6 +16,12 @@ function nazpro_theme_preprocess_page(&$variables) {
   // Подготавливаем представление для главной (block_2) - только для главной страницы
   if (\Drupal::service('path.matcher')->isFrontPage()) {
     $variables['projects_front'] = views_embed_view('projects', 'block_2');
+  }
+
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node instanceof \Drupal\node\NodeInterface/* && $node->bundle() === 'napravlenie'*/)
+  {
+    $variables['h1_title'] = $node->getTitle();
   }
 }
 
@@ -34,5 +41,12 @@ function nazpro_theme_preprocess_views_view__projects__block_2(&$variables) {
 
     $row->podrazdely_count = $count;
   }
+}
+
+function nazpro_theme_preprocess_node__razdel_napravleniya(&$variables) {
+
+  //dump(array_keys($variables));
+  //dump($variables['node']->toArray());
+  //$variables['content_array'] = $variables['content'];
 }
 

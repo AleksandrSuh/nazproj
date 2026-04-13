@@ -1,0 +1,7 @@
+name: 'Подразделы направлений'
+type: module
+description: 'Выводит подразделы на странице направления.'
+core_version_requirement: ^11
+package: Custom
+dependencies:
+  - drupal:node

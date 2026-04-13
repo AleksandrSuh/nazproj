@@ -1,0 +1,82 @@
+{# { dump(budget_data) }#}
+<div class="left-chart">
+    <div class="top-chart-cart">
+      <span class="line-chart need-bg"></span>
+      <div class="yars-chart">
+        {% if budget_data is empty %}
+          <p>Нет мероприятий с бюджетными данными</p>
+        {% else %}
+          {% for year, budget_items in budget_data %}
+          <span{% if curr_year == year %} class="active"{% endif %}>{{ year }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+    <div class="all-chart" style="display: block; height: 376px;">
+      {% if budget_data is empty %}
+      {% else %}
+        {% for year, budget_items in budget_data %}
+          <div class="bottom-chart-cart null-chart" style="{% if curr_year != year %}display: none; {% endif %}width: 533px;">
+            <div class="all-block-chart">
+              <div class="charts-block-cart">
+                <div class="one-chart">
+                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">{{ budget_items.summ.fedplan }}</div></div>
+                  <div class="chart"><span></span></div>
+                </div>
+                <div class="one-chart">
+                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">{{ budget_items.summ.regplan }}</div></div>
+                  <div class="chart"><span></span></div>
+                </div>
+                <div class="one-chart">
+                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">{{ budget_items.summ.munplan }}</div></div>
+                  <div class="chart"><span></span></div>
+                </div>
+              </div>
+              <div class="info-charts-cart">
+                <table cellspacing="0" class="table-info-carts">
+                  <tbody><tr>
+                    <th>Бюджет</th>
+                    <th>План <span>(млн ₽)</span></th>
+                    <th>Факт <span>(млн ₽)</span></th>
+                  </tr>
+                  <tr>
+                    <td>Федеральный</td>
+                    <td class="plan"><span></span>{{ budget_items.summ.fedplan }}</td>
+                    <td class="fakt"><span></span>{{ budget_items.summ.fedfakt }}</td>
+                  </tr>
+                  <tr>
+                    <td>Региональный</td>
+                    <td class="plan"><span></span>{{ budget_items.summ.regplan }}</td>
+                    <td class="fakt"><span></span>{{ budget_items.summ.regfakt }}</td>
+                  </tr>
+                  <tr>
+                    <td>Муниципальный</td>
+                    <td class="plan"><span></span>{{ budget_items.summ.munplan }}</td>
+                    <td class="fakt"><span></span>{{ budget_items.summ.munfakt }}</td>
+                  </tr>
+                  <tr>
+                    <td class="itog-chart">Итого</td>
+                    <td class="itog-plan">{{ budget_items.summ.iplan }}</td>
+                    <td class="itog-fakt">{{ budget_items.summ.ifakt }}</td>
+                  </tr>
+                  </tbody></table>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+  <div class="right-chart">
+    <div class="name-anons-chart">
+      <div class="zag-chart">
+        {{ node.title.value }}
+      </div>
+      <div class="anons-chart">
+        {{ node.field_description.value|raw }}
+      </div>
+      <div class="buts-chart">
+        <a href="{{ url }}" class="but-project">Мероприятия проекта <span>({{ count }})</span></a>.
+      </div>
+    </div>
+  </div>

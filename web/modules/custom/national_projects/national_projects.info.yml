@@ -1,0 +1,8 @@
+name: 'Национальные проекты'
+type: module
+description: 'Функционал для работы страниц - направлений, подразделов, мероприятий'
+core_version_requirement: ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:node
+  - drupal:path_alias

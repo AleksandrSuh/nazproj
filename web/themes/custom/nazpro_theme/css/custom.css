@@ -60,3 +60,18 @@ img {
 .oic-news-vn img {
 	width: 525px;
 }
+
+.budget-select-link {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #0074bd;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.budget-select-link:hover {
+  background: #005a8c;
+  color: white;
+  text-decoration: none;
+}

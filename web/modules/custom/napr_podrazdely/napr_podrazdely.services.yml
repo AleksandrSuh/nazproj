@@ -1,0 +1,4 @@
+services:
+  napr_podrazdely.budget_service:
+    class: Drupal\napr_podrazdely\BudgetService
+    arguments: ['@database']

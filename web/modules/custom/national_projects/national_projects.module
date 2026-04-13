@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function national_projects_theme($existing, $type, $theme, $path) {
+  return [
+    'direction_page' => [
+      'variables' => [
+        'direction' => NULL,
+        'direction_slug' => NULL,
+        'subsections' => [],
+      ],
+      'template' => 'direction-page',
+      'path' => \Drupal::service('extension.path.resolver')->getPath('module', 'national_projects') . '/templates',
+    ],
+  ];
+}

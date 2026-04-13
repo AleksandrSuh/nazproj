@@ -1,0 +1,35 @@
+national_projects.direction:
+  path: '/{slug}'
+  defaults:
+    _controller: '\Drupal\national_projects\Controller\DirectionController::content'
+    _title_callback: '\Drupal\national_projects\Controller\DirectionController::title'
+  requirements:
+    slug: '^[a-z0-9_-]+$'
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+national_projects.subsection:
+  path: '/{direction_slug}/{subsection_slug}'
+  defaults:
+    _controller: '\Drupal\national_projects\Controller\SubsectionController::content'
+    _title_callback: '\Drupal\national_projects\Controller\SubsectionController::title'
+  requirements:
+    direction_slug: '^[a-z0-9_-]+$'
+    subsection_slug: '^[a-z0-9_-]+$'
+
+national_projects.test:
+  path: '/hello/{name}'
+  defaults:
+    _controller: '\Drupal\national_projects\Controller\TestController::hello'
+  requirements:
+    name: '.*'
+    _access: 'TRUE'
+
+national_projects.test_direction:
+  path: '/infrastruktura'
+  defaults:
+    _controller: '\Drupal\national_projects\Controller\DirectionController::content'
+    slug: 'infrastruktura-dlya-zhizni'
+  requirements:
+    _access: 'TRUE'

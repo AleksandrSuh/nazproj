@@ -1,0 +1,37 @@
+<div class="subsection-page">
+  <div class="subsection-description">
+    {{ subsection.body.value|raw }}
+  </div>
+
+  <h2>Мероприятия</h2>
+
+  {% if events %}
+    <div class="events-list">
+      {% for event in events %}
+        <div class="event-item">
+          <h3>
+            <a href="{{ path('entity.node.canonical', {'node': event.id}) }}">
+              {{ event.label }}
+            </a>
+          </h3>
+          <div class="event-date">
+            Дата: {{ event.field_date.value|date('d.m.Y') }}
+          </div>
+          {% if event.body.value %}
+            <div class="event-description">
+              {{ event.body.value|striptags|slice(0, 200) }}...
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Мероприятий пока нет.</p>
+  {% endif %}
+
+  <p>
+    <a href="{{ path('national_projects.direction', {'slug': direction_slug}) }}">
+      ← Назад к подразделам направления
+    </a>
+  </p>
+</div>

@@ -1,0 +1,24 @@
+{%
+  set subsections_classes = [
+  'subsections-list',
+  'grid',
+  'grid--3cols'
+]
+%}
+
+<div class="direction-page">
+  <div class="direction-description">
+    {{ direction.body.value|raw }}
+  </div>
+
+  {% if subsections %}
+    <h2>Подразделы:</h2>
+    <ul>
+      {% for subsection in subsections %}
+        <li>{{ subsection.label }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Нет подразделов.</p>
+  {% endif %}
+</div>
