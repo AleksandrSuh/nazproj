@@ -9,6 +9,11 @@ function nazpro_theme_preprocess_html(array &$variables) {
   $variables['attributes']['class'][] = $class;
 }
 
+/**
+ * Implements template_preprocess_page().
+ */
+
+
 function nazpro_theme_preprocess_page(&$variables) {
   // Подготавливаем представление для шапки (block_1)
   $variables['projects_header'] = views_embed_view('projects', 'block_1');
@@ -22,6 +27,131 @@ function nazpro_theme_preprocess_page(&$variables) {
   if ($node instanceof \Drupal\node\NodeInterface/* && $node->bundle() === 'napravlenie'*/)
   {
     $variables['h1_title'] = $node->getTitle();
+
+    if ($node->bundle() === 'napravlenie' || $node->bundle() === 'razdel_napravleniya') {
+
+      $budget_service = \Drupal::service('napr_podrazdely.budget_service');
+      if ($node->bundle() === 'napravlenie')
+      {
+        $podrazdely = \Drupal::entityTypeManager()
+          ->getStorage('node')
+          ->loadByProperties([
+            'type' => 'razdel_napravleniya',
+            'field_napravlenie' => $node->id(),
+          ]);
+      }
+      if ($node->bundle() === 'razdel_napravleniya')
+      {
+        $podrazdely = \Drupal::entityTypeManager()
+          ->getStorage('node')
+          ->loadByProperties([
+            'type' => 'meropriyatie',
+            'field_section' => $node->id(),
+          ]);
+      }
+      // Суммарные данные из всех подразделов через сервис
+
+      $arYearsData = [];
+      //dump($podrazdely);
+      foreach ($podrazdely as $podrazdel) {
+        if ($node->bundle() === 'napravlenie')
+        {
+          $budget_data = $budget_service->getBudgetDataForSection($podrazdel);
+        }
+        if ($node->bundle() === 'razdel_napravleniya')
+        {
+          $budget_data = $budget_service->getBudgetDataMeropr($podrazdel);
+        }
+
+        foreach ($budget_data as $arRow)
+        {
+          foreach ($arRow as $obData)
+          {
+            //dump($obData);
+            $arData = (array)$obData;
+            $arYearsData[$arData['year']]['data'][] = $arData;
+          }
+        }
+        foreach ($arYearsData as $year => $arYData)
+        {
+          $arSumm = [
+            'iplan' => 0,
+            'fedplan' => 0,
+            'regplan' => 0,
+            'munplan' => 0,
+            'ifakt' => 0,
+            'fedfakt' => 0,
+            'regfakt' => 0,
+            'munfakt' => 0,
+          ];
+          foreach ($arYData['data'] as $arRow)
+          {
+            if ($arRow['extence_fed_plan']==0 && $arRow['extence_reg_plan']==0 && $arRow['extence_mun_plan']==0) {
+              if (mb_substr($arRow['dop_fk'], 0, 1)==8) {
+                $arRow['extence_fed_plan'] = $arRow['extence_plan'];
+              } elseif (mb_substr($arRow['dop_fk'], 0, 1)==6 || mb_substr($arRow['dop_fk'], 0, 1)==9) {
+                $arRow['extence_reg_plan'] = $arRow['extence_plan'];
+              } else {
+                $arRow['extence_mun_plan'] = $arRow['extence_plan'];
+              }
+            }
+            if ($arRow['income_fed_fact']==0 && $arRow['income_reg_fact']==0 && $arRow['income_mun_fact']==0) {
+              if (mb_substr($arRow['dop_fk'], 0, 1)==8) {
+                $arRow['income_fed_fact'] = $arRow['income_fact'];
+              } elseif (mb_substr($arRow['dop_fk'], 0, 1)==6 || mb_substr($arRow['dop_fk'], 0, 1)==9) {
+                $arRow['income_reg_fact'] = $arRow['income_fact'];
+              } else {
+                $arRow['income_mun_fact'] = $arRow['income_fact'];
+              }
+            }
+            $arSumm['ifakt'] += $arRow['extence_plan'];
+            $arSumm['fedfakt'] += $arRow['extence_fed_plan'];
+            $arSumm['regfakt'] += $arRow['extence_reg_plan'];
+            $arSumm['munfakt'] += $arRow['extence_mun_plan'];
+            $arSumm['iplan'] += $arRow['income_fact'];
+            $arSumm['fedplan'] += $arRow['income_fed_fact'];
+            $arSumm['regplan'] += $arRow['income_reg_fact'];
+            $arSumm['munplan'] += $arRow['income_mun_fact'];
+          }
+          foreach ($arSumm as $field => &$value)
+          {
+            $value = round($value / 1000000, 1);
+          }
+          $arYearsData[$year]['summ'] = $arSumm;
+        }
+
+
+      }
+
+      $variables['total_budget_data'] = $arYearsData;// $all_budget_data;
+      $variables['curr_year'] = date('Y');
+
+
+      // Для подраздела
+      if ($node->bundle() == 'razdel_napravleniya') {
+        $parent = $node->get('field_napravlenie')->entity;
+        if ($parent) {
+          $variables['parent_url'] = $parent->toUrl()->toString();
+          $variables['parent_label'] = $parent->label();
+        }
+      }
+
+      // Для мероприятия
+      if ($node->bundle() == 'meropriyatie') {
+        $podrazdel = $node->get('field_section')->entity;
+        if ($podrazdel) {
+          $napravlenie = $podrazdel->get('field_napravlenie')->entity;
+          if ($napravlenie) {
+            $variables['napravlenie_url'] = $napravlenie->toUrl()->toString();
+            $variables['napravlenie_label'] = $napravlenie->label();
+          }
+          $variables['podrazdel_url'] = $podrazdel->toUrl()->toString();
+          $variables['podrazdel_label'] = $podrazdel->label();
+        }
+      }
+
+      //dump($variables['total_budget_data']);
+    }
   }
 }
 

@@ -20,7 +20,7 @@ $(function ($) {
 	});
 });
 
-
+/*
 (function() {
   var urlParams = new URLSearchParams(window.location.search);
   var preselectedIds = urlParams.get('selected');
@@ -70,10 +70,11 @@ $(function ($) {
   });
 })();
 
+ */
+
 document.addEventListener('DOMContentLoaded', function() {
   const currentYear = new Date().getFullYear();
 
-  // Ждём, когда слайдер будет готов
   setTimeout(function() {
     const slider = document.querySelector('.yars-chart-slider');
     if (!slider) return;

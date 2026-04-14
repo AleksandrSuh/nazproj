@@ -1,4 +1,3 @@
-{# { dump(budget_data) }#}
 <div class="left-chart">
     <div class="top-chart-cart">
       <span class="line-chart need-bg"></span>
@@ -69,14 +68,27 @@
   </div>
   <div class="right-chart">
     <div class="name-anons-chart">
-      <div class="zag-chart">
-        {{ node.title.value }}
-      </div>
-      <div class="anons-chart">
-        {{ node.field_description.value|raw }}
-      </div>
-      <div class="buts-chart">
-        <a href="{{ url }}" class="but-project">Мероприятия проекта <span>({{ count }})</span></a>.
-      </div>
+      {% if node_type == 'napravlenie' %}
+        <div class="zag-chart">
+          {{ node.title.value }}
+        </div>
+        <div class="anons-chart">
+          {{ node.field_description.value|raw }}
+        </div>
+        <div class="buts-chart">
+          <a href="{{ url }}" class="but-project">Мероприятия проекта <span>({{ count }})</span></a>
+        </div>
+      {% endif %}
+      {% if node_type == 'razdel_napravleniya' %}
+        <div class="zag-chart">
+          {{ node.field_desc.value|raw }}
+        </div>
+        <div class="anons-chart">
+          {{ node.field_description.value|raw }}
+        </div>
+        <div class="buts-chart">
+          <a href="{{ url }}" class="but-project">Объекты мероприятия <span>({{ count }})</span></a>
+        </div>
+      {% endif %}
     </div>
   </div>

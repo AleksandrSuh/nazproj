@@ -43,7 +43,7 @@
       </div>
       {{ page.header_chart }}
     </div>
-      {% else %}
+    {% else %}
     <div class='chart-zag'>
       <div class='zag-str'>
         {% if h1_title %}
@@ -52,25 +52,32 @@
       </div>
       <div class="row">
         {# { page.header_chart } #}
+        {% if total_budget_data is defined and total_budget_data is not empty %}
         <div class="chart-gl">
           <div class="top-chart">
-            <span class="line-chart need-bg" style="left: 472px;"></span>
+            <span class="line-chart need-bg"></span>
             <div class="yars-chart">
-              <span class="">2020</span><span class="no_click_year">2021</span><span class="no_click_year">2022</span><span class="no_click_year">2023</span><span class="no_click_year">2024</span><span class="">2025</span><span class="active ready">2026</span><span class="">2027</span><span class="">2028</span>								</div>
+              {% for year, budget_items in total_budget_data %}
+                <span{% if curr_year == year %} class="active"{% endif %}>{{ year }}</span>
+              {% endfor %}
+            </div>
           </div>
-          <div class="bottom-chart null-chart" style="display: none;">
+          {% if total_budget_data is empty %}
+          {% else %}
+          {% for year, budget_items in total_budget_data %}
+          <div class="bottom-chart{% if curr_year != year %} null-chart{% else %} fadein active{% endif %}"{% if curr_year != year %} style="display: none;"{% endif %}>
             <div class="all-block-chart">
               <div class="charts-block">
                 <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет (хардкор)</div><div class="meaning-chart">0</div></div>
+                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">{{ budget_items.summ.fedplan }}</div></div>
                   <div class="chart"><span></span></div>
                 </div>
                 <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">0</div></div>
+                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">{{ budget_items.summ.regplan }}</div></div>
                   <div class="chart"><span></span></div>
                 </div>
                 <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">0</div></div>
+                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">{{ budget_items.summ.munplan }}</div></div>
                   <div class="chart"><span></span></div>
                 </div>
               </div>
@@ -83,412 +90,61 @@
                   </tr>
                   <tr>
                     <td>Федеральный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
+                    <td class="plan"><span></span>{{ budget_items.summ.fedplan }}</td>
+                    <td class="fakt"><span></span>{{ budget_items.summ.fedfakt }}</td>
                   </tr>
                   <tr>
                     <td>Региональный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
+                    <td class="plan"><span></span>{{ budget_items.summ.regplan }}</td>
+                    <td class="fakt"><span></span>{{ budget_items.summ.regfakt }}</td>
                   </tr>
                   <tr>
                     <td>Муниципальный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
+                    <td class="plan"><span></span>{{ budget_items.summ.munplan }}</td>
+                    <td class="fakt"><span></span>{{ budget_items.summ.munfakt }}</td>
                   </tr>
                   <tr>
                     <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">0</td>
-                    <td class="itog-fakt">0</td>
+                    <td class="itog-plan">{{ budget_items.summ.iplan }}</td>
+                    <td class="itog-fakt">{{ budget_items.summ.ifakt }}</td>
                   </tr>
                   </tbody></table>
               </div>
             </div>
           </div>
-          <div class="bottom-chart null-chart" style="display: none;">
-            <div class="all-block-chart">
-              <div class="charts-block">
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-              </div>
-              <div class="info-carts">
-                <table cellspacing="0" class="table-info-carts">
-                  <tbody><tr>
-                    <th>Бюджет</th>
-                    <th>План <span>(млн ₽)</span></th>
-                    <th>Факт <span>(млн ₽)</span></th>
-                  </tr>
-                  <tr>
-                    <td>Федеральный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Региональный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Муниципальный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">0</td>
-                    <td class="itog-fakt">0</td>
-                  </tr>
-                  </tbody></table>
-              </div>
-            </div>
-          </div>
-          <div class="bottom-chart null-chart" style="display: none;">
-            <div class="all-block-chart">
-              <div class="charts-block">
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-              </div>
-              <div class="info-carts">
-                <table cellspacing="0" class="table-info-carts">
-                  <tbody><tr>
-                    <th>Бюджет</th>
-                    <th>План <span>(млн ₽)</span></th>
-                    <th>Факт <span>(млн ₽)</span></th>
-                  </tr>
-                  <tr>
-                    <td>Федеральный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Региональный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Муниципальный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">0</td>
-                    <td class="itog-fakt">0</td>
-                  </tr>
-                  </tbody></table>
-              </div>
-            </div>
-          </div>
-          <div class="bottom-chart null-chart" style="display: none;">
-            <div class="all-block-chart">
-              <div class="charts-block">
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-              </div>
-              <div class="info-carts">
-                <table cellspacing="0" class="table-info-carts">
-                  <tbody><tr>
-                    <th>Бюджет</th>
-                    <th>План <span>(млн ₽)</span></th>
-                    <th>Факт <span>(млн ₽)</span></th>
-                  </tr>
-                  <tr>
-                    <td>Федеральный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Региональный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Муниципальный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">0</td>
-                    <td class="itog-fakt">0</td>
-                  </tr>
-                  </tbody></table>
-              </div>
-            </div>
-          </div>
-          <div class="bottom-chart null-chart" style="display: none;">
-            <div class="all-block-chart">
-              <div class="charts-block">
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">0</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-              </div>
-              <div class="info-carts">
-                <table cellspacing="0" class="table-info-carts">
-                  <tbody><tr>
-                    <th>Бюджет</th>
-                    <th>План <span>(млн ₽)</span></th>
-                    <th>Факт <span>(млн ₽)</span></th>
-                  </tr>
-                  <tr>
-                    <td>Федеральный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Региональный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Муниципальный</td>
-                    <td class="plan"><span></span>0</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">0</td>
-                    <td class="itog-fakt">0</td>
-                  </tr>
-                  </tbody></table>
-              </div>
-            </div>
-          </div>
-          <div class="bottom-chart null-chart" style="display: none;">
-            <div class="all-block-chart">
-              <div class="charts-block">
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">132.7</div></div>
-                  <div class="chart"><span style="width: calc(100% - 5px);">100%</span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">1997.7</div></div>
-                  <div class="chart"><span style="width: calc(98% - 5px);">98%</span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">180.2</div></div>
-                  <div class="chart"><span style="width: calc(99% - 5px);">99%</span></div>
-                </div>
-              </div>
-              <div class="info-carts">
-                <table cellspacing="0" class="table-info-carts">
-                  <tbody><tr>
-                    <th>Бюджет</th>
-                    <th>План <span>(млн ₽)</span></th>
-                    <th>Факт <span>(млн ₽)</span></th>
-                  </tr>
-                  <tr>
-                    <td>Федеральный</td>
-                    <td class="plan"><span></span>132.7</td>
-                    <td class="fakt"><span></span>132.7</td>
-                  </tr>
-                  <tr>
-                    <td>Региональный</td>
-                    <td class="plan"><span></span>1997.7</td>
-                    <td class="fakt"><span></span>1956.1</td>
-                  </tr>
-                  <tr>
-                    <td>Муниципальный</td>
-                    <td class="plan"><span></span>180.2</td>
-                    <td class="fakt"><span></span>179</td>
-                  </tr>
-                  <tr>
-                    <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">2310.6</td>
-                    <td class="itog-fakt">2267.8</td>
-                  </tr>
-                  </tbody></table>
-              </div>
-            </div>
-          </div>
-          <div class="bottom-chart fadein active" style="">
-            <div class="all-block-chart">
-              <div class="charts-block">
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">332.4</div></div>
-                  <div class="chart"><span style="width: calc(8% - 5px);">8%</span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">1130.7</div></div>
-                  <div class="chart"><span style="width: calc(0% - 5px);"></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">364.9</div></div>
-                  <div class="chart"><span style="width: calc(8% - 5px);">8%</span></div>
-                </div>
-              </div>
-              <div class="info-carts">
-                <table cellspacing="0" class="table-info-carts">
-                  <tbody><tr>
-                    <th>Бюджет</th>
-                    <th>План <span>(млн ₽)</span></th>
-                    <th>Факт <span>(млн ₽)</span></th>
-                  </tr>
-                  <tr>
-                    <td>Федеральный</td>
-                    <td class="plan"><span></span>332.4</td>
-                    <td class="fakt"><span></span>25.8</td>
-                  </tr>
-                  <tr>
-                    <td>Региональный</td>
-                    <td class="plan"><span></span>1130.7</td>
-                    <td class="fakt"><span></span>4.2</td>
-                  </tr>
-                  <tr>
-                    <td>Муниципальный</td>
-                    <td class="plan"><span></span>364.9</td>
-                    <td class="fakt"><span></span>30</td>
-                  </tr>
-                  <tr>
-                    <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">1828</td>
-                    <td class="itog-fakt">60</td>
-                  </tr>
-                  </tbody></table>
-              </div>
-            </div>
-          </div>
-          <div class="bottom-chart null-chart" style="display: none;">
-            <div class="all-block-chart">
-              <div class="charts-block">
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">206.4</div></div>
-                  <div class="chart"><span style="width: calc(0% - 5px);"></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">1635.5</div></div>
-                  <div class="chart"><span style="width: calc(0% - 5px);"></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">173.4</div></div>
-                  <div class="chart"><span style="width: calc(0% - 5px);"></span></div>
-                </div>
-              </div>
-              <div class="info-carts">
-                <table cellspacing="0" class="table-info-carts">
-                  <tbody><tr>
-                    <th>Бюджет</th>
-                    <th>План <span>(млн ₽)</span></th>
-                    <th>Факт <span>(млн ₽)</span></th>
-                  </tr>
-                  <tr>
-                    <td>Федеральный</td>
-                    <td class="plan"><span></span>206.4</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Региональный</td>
-                    <td class="plan"><span></span>1635.5</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Муниципальный</td>
-                    <td class="plan"><span></span>173.4</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">2015.3</td>
-                    <td class="itog-fakt">0</td>
-                  </tr>
-                  </tbody></table>
-              </div>
-            </div>
-          </div>
-          <div class="bottom-chart null-chart" style="display: none;">
-            <div class="all-block-chart">
-              <div class="charts-block">
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">208.6</div></div>
-                  <div class="chart"><span style="width: calc(0% - 5px);"></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">1069</div></div>
-                  <div class="chart"><span style="width: calc(0% - 5px);"></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">143.8</div></div>
-                  <div class="chart"><span style="width: calc(0% - 5px);"></span></div>
-                </div>
-              </div>
-              <div class="info-carts">
-                <table cellspacing="0" class="table-info-carts">
-                  <tbody><tr>
-                    <th>Бюджет</th>
-                    <th>План <span>(млн ₽)</span></th>
-                    <th>Факт <span>(млн ₽)</span></th>
-                  </tr>
-                  <tr>
-                    <td>Федеральный</td>
-                    <td class="plan"><span></span>208.6</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Региональный</td>
-                    <td class="plan"><span></span>1069</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td>Муниципальный</td>
-                    <td class="plan"><span></span>143.8</td>
-                    <td class="fakt"><span></span>0</td>
-                  </tr>
-                  <tr>
-                    <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">1421.3</td>
-                    <td class="itog-fakt">0</td>
-                  </tr>
-                  </tbody></table>
-              </div>
-            </div>
-          </div>
+          {% endfor %}
+          {% endif %}
+          {% else %}
+            пусто
+          {% endif %}
         </div>
       </div>
     </div>
     {% endif %}
   </div>
 </section>
-{{ projects_front }}
-{{ page.content }}
+   {% if not is_front %}
+     {% if node %}
+       <section class="telo-nac">
+       <div id="breadcrumbs">
+         <a href="/" class="one-breadcrumbs">Главная</a>
+         {% if node.bundle() == 'razdel_napravleniya' %}/
+           <a href="{{ parent_url }}" class="one-breadcrumbs" title="{{ parent_label }}" itemprop="item">{{ parent_label }}</a>/
+           <span class="one-breadcrumbs">{{ node.label }}</span>
+         {% elseif node.bundle() == 'meropriyatie' %}/
+           <a href="{{ napravlenie_url }}" class="one-breadcrumbs" title="{{ napravlenie_label }}" itemprop="item">{{ napravlenie_label }}</a>/
+           <a href="{{ podrazdel_url }}" class="one-breadcrumbs" title="{{ podrazdel_label }}" itemprop="item">{{ podrazdel_label }}</a>/
+           <span class="one-breadcrumbs">{{ node.label }}</span>
+         {% elseif node.bundle() == 'napravlenie' %}
+           <span>{{ node.label }}</span>
+         {% endif %}
+       </div>
+       </section>
+     {% endif %}
+     {{ page.content }}
+   {% else %}
+     {{ projects_front }}
+   {% endif %}
 <!--section class='telo-nac'>
 
   <article class='all-project-gl'>

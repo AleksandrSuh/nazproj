@@ -16,7 +16,14 @@ function napr_podrazdely_theme($existing, $type, $theme, $path) {
       'template' => 'podrazdel-with-count',
     ],
     'podrazdel_with_budget' => [
-      'variables' => ['node' => NULL, 'budget_data' => [], 'count' => 0, 'url' => '', 'curr_year' => date('Y')],
+      'variables' => [
+        'node' => NULL,
+        'budget_data' => [],
+        'count' => 0,
+        'node_type' => '',
+        'url' => '',
+        'curr_year' => date('Y')
+      ],
       'template' => 'podrazdel-with-budget',
     ],
   ];
@@ -25,22 +32,44 @@ function napr_podrazdely_theme($existing, $type, $theme, $path) {
  * Implements hook_ENTITY_TYPE_view() for 'node' entities.
  */
 function napr_podrazdely_node_view(array &$build, EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
-  if ($entity->bundle() !== 'napravlenie' || $view_mode !== 'full') {
+
+  $node_type = $entity->bundle();
+  if ($node_type !== 'napravlenie' && $node_type !== 'razdel_napravleniya' || $view_mode !== 'full') {
     return;
   }
 
-  $podrazdely = \Drupal::entityTypeManager()
-    ->getStorage('node')
-    ->loadByProperties([
-      'type' => 'razdel_napravleniya',
-      'field_napravlenie' => $entity->id(),
-    ]);
+  if ($node_type === 'napravlenie')
+  {
+    $podrazdely = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->loadByProperties([
+        'type' => 'razdel_napravleniya',
+        'field_napravlenie' => $entity->id(),
+      ]);
+  }
+  if ($node_type === 'razdel_napravleniya')
+  {
+    $podrazdely = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->loadByProperties([
+        'type' => 'meropriyatie',
+        'field_section' => $entity->id(),
+      ]);
+  }
 
   $budget_service = \Drupal::service('napr_podrazdely.budget_service');
 
   $items = [];
   foreach ($podrazdely as $podrazdel) {
-    $budget_data = $budget_service->getBudgetDataForSection($podrazdel);
+
+    if ($node_type === 'napravlenie')
+    {
+      $budget_data = $budget_service->getBudgetDataForSection($podrazdel);
+    }
+    if ($node_type === 'razdel_napravleniya')
+    {
+      $budget_data = $budget_service->getBudgetDataMeropr($podrazdel);
+    }
     $merpr_count = 0;
     $arYearsData = [];
     foreach ($budget_data as $arRow)
@@ -106,7 +135,8 @@ function napr_podrazdely_node_view(array &$build, EntityInterface $entity, \Drup
       '#node' => $podrazdel,
       '#budget_data' => $arYearsData,//$budget_data,
       '#url' => $podrazdel->toUrl()->toString(),
-      '#count' => count($budget_data)
+      '#count' => count($budget_data),
+      '#node_type' => $node_type
     ];
   }
 
@@ -120,6 +150,147 @@ function napr_podrazdely_node_view(array &$build, EntityInterface $entity, \Drup
       '#title' => 'Подразделы направления',
     ],
   ];
+
+  /*
+  function napr_podrazdely_system_breadcrumb_build(\Drupal\Core\Routing\RouteMatchInterface $route_match) {
+    // Получаем текущий узел
+    $node = $route_match->getParameter('node');
+    dump($node);
+
+    if (!$node instanceof \Drupal\node\NodeInterface) {
+      return NULL;
+    }
+
+    $breadcrumb = new \Drupal\Core\Breadcrumb\Breadcrumb();
+    $links = [];
+
+    // Ссылка на главную
+    $links[] = \Drupal\Core\Link::createFromRoute('Главная', '<front>');
+
+    // Для страницы направления
+    if ($node->bundle() === 'napravlenie') {
+      $breadcrumb->setLinks($links);
+      $breadcrumb->addCacheContexts(['url.path']);
+      return $breadcrumb;
+    }
+
+    // Для страницы подраздела (razdel_napravleniya)
+    if ($node->bundle() === 'razdel_napravleniya') {
+      $parent_napravlenie = $node->get('field_napravlenie')->entity;
+      if ($parent_napravlenie) {
+        $links[] = \Drupal\Core\Link::fromTextAndUrl(
+          $parent_napravlenie->getTitle(),
+          $parent_napravlenie->toUrl()
+        );
+      }
+
+      $breadcrumb->setLinks($links);
+      $breadcrumb->addCacheContexts(['url.path']);
+      return $breadcrumb;
+    }
+
+    // Для страницы мероприятия
+    if ($node->bundle() === 'meropriyatie') {
+      $parent_podrazdel = $node->get('field_section')->entity;
+      if ($parent_podrazdel) {
+        $parent_napravlenie = $parent_podrazdel->get('field_napravlenie')->entity;
+        if ($parent_napravlenie) {
+          $links[] = \Drupal\Core\Link::fromTextAndUrl(
+            $parent_napravlenie->getTitle(),
+            $parent_napravlenie->toUrl()
+          );
+        }
+
+        $links[] = \Drupal\Core\Link::fromTextAndUrl(
+          $parent_podrazdel->getTitle(),
+          $parent_podrazdel->toUrl()
+        );
+      }
+
+      $breadcrumb->setLinks($links);
+      $breadcrumb->addCacheContexts(['url.path']);
+      return $breadcrumb;
+    }
+
+    return NULL;
+  }
+
+
+
+  function napr_podrazdely_system_breadcrumb_alter(\Drupal\Core\Breadcrumb\Breadcrumb &$breadcrumb, \Drupal\Core\Routing\RouteMatchInterface $route_match, array $context) {
+    // Получаем текущий узел
+    $node = $route_match->getParameter('node');
+    dump($node);
+    if (!$node instanceof \Drupal\node\NodeInterface) {
+      return;
+    }
+
+    // Для страницы направления
+    if ($node->bundle() === 'napravlenie') {
+      $links = $breadcrumb->getLinks();
+      dump($links);
+      // Оставляем только "Главная", добавляем текущий заголовок
+      $breadcrumb->setLinks($links);
+      return;
+    }
+
+    // Для страницы подраздела (razdel_napravleniya)
+    if ($node->bundle() === 'razdel_napravleniya') {
+      $links = [];
+
+      // Ссылка на главную
+      $links[] = \Drupal\Core\Link::createFromRoute('Главная', '<front>');
+
+      // Получаем родительское направление
+      $parent_napravlenie = $node->get('field_napravlenie')->entity;
+      if ($parent_napravlenie) {
+        $links[] = \Drupal\Core\Link::fromTextAndUrl(
+          $parent_napravlenie->getTitle(),
+          $parent_napravlenie->toUrl()
+        );
+      }
+
+      // Текущий подраздел (без ссылки)
+      $breadcrumb = new \Drupal\Core\Breadcrumb\Breadcrumb();
+      $breadcrumb->setLinks($links);
+      $breadcrumb->addCacheContexts(['url.path']);
+      return;
+    }
+
+    // Для страницы мероприятия (meropriyatie)
+    if ($node->bundle() === 'meropriyatie') {
+      $links = [];
+
+      // Ссылка на главную
+      $links[] = \Drupal\Core\Link::createFromRoute('Главная', '<front>');
+
+      // Получаем родительский подраздел
+      $parent_podrazdel = $node->get('field_section')->entity;
+      if ($parent_podrazdel) {
+        // Получаем направление через подраздел
+        $parent_napravlenie = $parent_podrazdel->get('field_napravlenie')->entity;
+        if ($parent_napravlenie) {
+          $links[] = \Drupal\Core\Link::fromTextAndUrl(
+            $parent_napravlenie->getTitle(),
+            $parent_napravlenie->toUrl()
+          );
+        }
+
+        $links[] = \Drupal\Core\Link::fromTextAndUrl(
+          $parent_podrazdel->getTitle(),
+          $parent_podrazdel->toUrl()
+        );
+      }
+
+      // Текущее мероприятие (без ссылки)
+      $breadcrumb = new \Drupal\Core\Breadcrumb\Breadcrumb();
+      $breadcrumb->setLinks($links);
+      $breadcrumb->addCacheContexts(['url.path']);
+      return;
+    }
+  }
+  */
+
 
   /*
   $original = $build;
