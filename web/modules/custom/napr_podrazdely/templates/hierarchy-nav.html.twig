@@ -1,0 +1,13 @@
+{% for napravlenie in hierarchy %}
+  <div class="gl-tab">{{ napravlenie.title }}</div>
+
+  {% for razdel in napravlenie.children %}
+    <div class="one-project-tab">{{ razdel.title }}</div>
+
+    {% for meropriyatie in razdel.children %}
+      <div class="one-object-tab need-color" onclick="window.location = '{{ meropriyatie.url }}'">
+        {{ meropriyatie.title }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+{% endfor %}

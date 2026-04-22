@@ -1,0 +1,12 @@
+objects_styles:
+  version: 1.0
+  #css:
+   # theme:
+    #  css/objects-styles.css: {}
+  js:
+    js/objects-sort.js: {}
+    js/objects-map.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings

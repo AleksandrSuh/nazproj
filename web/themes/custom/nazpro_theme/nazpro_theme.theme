@@ -136,21 +136,24 @@ function nazpro_theme_preprocess_page(&$variables) {
         }
       }
 
-      // Для мероприятия
-      if ($node->bundle() == 'meropriyatie') {
-        $podrazdel = $node->get('field_section')->entity;
-        if ($podrazdel) {
-          $napravlenie = $podrazdel->get('field_napravlenie')->entity;
-          if ($napravlenie) {
-            $variables['napravlenie_url'] = $napravlenie->toUrl()->toString();
-            $variables['napravlenie_label'] = $napravlenie->label();
-          }
-          $variables['podrazdel_url'] = $podrazdel->toUrl()->toString();
-          $variables['podrazdel_label'] = $podrazdel->label();
-        }
-      }
 
       //dump($variables['total_budget_data']);
+    }
+
+    // Для мероприятия
+    if ($node->bundle() === 'meropriyatie') {
+      $podrazdel = $node->get('field_section')->entity;
+      if ($podrazdel) {
+        $napravlenie = $podrazdel->get('field_napravlenie')->entity;
+        if ($napravlenie) {
+          $variables['napravlenie_url'] = $napravlenie->toUrl()->toString();
+          $variables['napravlenie_label'] = $napravlenie->label();
+        }
+        $variables['podrazdel_url'] = $podrazdel->toUrl()->toString();
+        $variables['podrazdel_label'] = $podrazdel->label();
+      }
+
+      $variables['h1_title'] = 'ОБъекты мероприятия «'.$node->getTitle().'»';
     }
   }
 }

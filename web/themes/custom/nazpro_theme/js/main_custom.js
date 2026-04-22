@@ -10,7 +10,7 @@ $(function ($) {
 			e.preventDefault();
 			var rel=$(this).attr('rel');
 			$('.gallery'+rel).fancybox().click();
-
+      console.log(rel);
 			/*var url=$('.img_hidden[rel="'+rel+'"]').find('a').attr('href');
 
 			$.fancybox.open(url);*/

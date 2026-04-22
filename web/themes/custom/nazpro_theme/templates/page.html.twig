@@ -115,7 +115,7 @@
           {% endfor %}
           {% endif %}
           {% else %}
-            пусто
+
           {% endif %}
         </div>
       </div>
@@ -127,11 +127,11 @@
      {% if node %}
        <section class="telo-nac">
        <div id="breadcrumbs">
-         <a href="/" class="one-breadcrumbs">Главная</a>
-         {% if node.bundle() == 'razdel_napravleniya' %}/
+         <a href="/" class="one-breadcrumbs">Главная</a>/
+         {% if node.bundle() == 'razdel_napravleniya' %}
            <a href="{{ parent_url }}" class="one-breadcrumbs" title="{{ parent_label }}" itemprop="item">{{ parent_label }}</a>/
            <span class="one-breadcrumbs">{{ node.label }}</span>
-         {% elseif node.bundle() == 'meropriyatie' %}/
+         {% elseif node.bundle() == 'meropriyatie' %}
            <a href="{{ napravlenie_url }}" class="one-breadcrumbs" title="{{ napravlenie_label }}" itemprop="item">{{ napravlenie_label }}</a>/
            <a href="{{ podrazdel_url }}" class="one-breadcrumbs" title="{{ podrazdel_label }}" itemprop="item">{{ podrazdel_label }}</a>/
            <span class="one-breadcrumbs">{{ node.label }}</span>
@@ -167,7 +167,7 @@
     </article>        			<article class='one-project-gl' style='background-color:#919191'>
       <a href='/arch/'>
         <span class='name-project-gl'>Нацпроекты 2020-2024</span>
-      </a>
+      </a>Внедрение интеллектуальных транспортных систем, предусматривающих автоматизацию процессов управления дорожным движением в городских агломерациях, включающих города с населением свыше 300 тысяч человек
     </article>
   </article>
 </section-->

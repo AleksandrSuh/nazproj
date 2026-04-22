@@ -26,6 +26,28 @@ function napr_podrazdely_theme($existing, $type, $theme, $path) {
       ],
       'template' => 'podrazdel-with-budget',
     ],
+    'objects_on_meropriyatie' => [
+      'variables' => [
+        'objects' => [],
+        'node' => NULL,
+        'meropriyatie' => NULL,
+      ],
+      'template' => 'objects-on-meropriyatie',
+      //'path' => drupal_get_path('module', 'napr_podrazdely') . '/templates',
+    ],
+    'object_teaser' => [
+      'variables' => [
+        'object' => NULL,
+        'title' => '',
+        'address' => '',
+        'srok' => '',
+        'cost' => '',
+        'images' => [],
+        'coords' => '',
+      ],
+      'template' => 'object-teaser',
+      //'path' => drupal_get_path('module', 'napr_podrazdely') . '/templates',
+    ],
   ];
 }
 /**
@@ -34,304 +56,454 @@ function napr_podrazdely_theme($existing, $type, $theme, $path) {
 function napr_podrazdely_node_view(array &$build, EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
 
   $node_type = $entity->bundle();
-  if ($node_type !== 'napravlenie' && $node_type !== 'razdel_napravleniya' || $view_mode !== 'full') {
+  if ($node_type !== 'napravlenie' && $node_type !== 'razdel_napravleniya' && $node_type !== 'meropriyatie' || $view_mode !== 'full') {
     return;
   }
 
-  if ($node_type === 'napravlenie')
-  {
-    $podrazdely = \Drupal::entityTypeManager()
+  if ($node_type === 'meropriyatie') {
+
+    $build = [
+      '#entity_type' => 'node',
+      '#node' => $entity,
+    ];
+    $objects = \Drupal::entityTypeManager()
       ->getStorage('node')
       ->loadByProperties([
-        'type' => 'razdel_napravleniya',
-        'field_napravlenie' => $entity->id(),
+        'type' => 'object',
+        'field_meropriyatie' => $entity->id(),
+        'status' => 1,
       ]);
+
+    if (!empty($objects)) {
+      $objects_render = [];
+      foreach ($objects as $object) {
+        $objects_render[] = \Drupal::entityTypeManager()
+          ->getViewBuilder('node')
+          ->view($object, 'teaser');
+      }
+
+      // Добавляем секцию объектов
+      $build['objects_section'] = [
+        '#theme' => 'objects_on_meropriyatie',
+        '#objects' => $objects_render,
+        '#meropriyatie' => $entity,
+        '#attached' => [
+          'library' => [
+            'napr_podrazdely/objects_styles',
+            'napr_podrazdely/fancybox',
+          ],
+          'drupalSettings' => [
+            'objects' => [
+              'meropriyatie_nid' => $entity->id(),
+            ],
+          ],
+        ],
+        '#weight' => 10,
+      ];
+    }
   }
-  if ($node_type === 'razdel_napravleniya')
+  else
   {
-    $podrazdely = \Drupal::entityTypeManager()
-      ->getStorage('node')
-      ->loadByProperties([
-        'type' => 'meropriyatie',
-        'field_section' => $entity->id(),
-      ]);
-  }
-
-  $budget_service = \Drupal::service('napr_podrazdely.budget_service');
-
-  $items = [];
-  foreach ($podrazdely as $podrazdel) {
-
     if ($node_type === 'napravlenie')
     {
-      $budget_data = $budget_service->getBudgetDataForSection($podrazdel);
+      $podrazdely = \Drupal::entityTypeManager()
+        ->getStorage('node')
+        ->loadByProperties([
+          'type' => 'razdel_napravleniya',
+          'field_napravlenie' => $entity->id(),
+        ]);
     }
     if ($node_type === 'razdel_napravleniya')
     {
-      $budget_data = $budget_service->getBudgetDataMeropr($podrazdel);
+      $podrazdely = \Drupal::entityTypeManager()
+        ->getStorage('node')
+        ->loadByProperties([
+          'type' => 'meropriyatie',
+          'field_section' => $entity->id(),
+        ]);
     }
-    $merpr_count = 0;
-    $arYearsData = [];
-    foreach ($budget_data as $arRow)
-    {
-      foreach ($arRow as $obData)
+
+
+    $budget_service = \Drupal::service('napr_podrazdely.budget_service');
+
+    $items = [];
+    foreach ($podrazdely as $podrazdel) {
+
+      if ($node_type === 'napravlenie')
       {
-        $arData = (array)$obData;
-        $arYearsData[$arData['year']]['data'][] = $arData;
+        $budget_data = $budget_service->getBudgetDataForSection($podrazdel);
       }
-    }
-    foreach ($arYearsData as $year => $arYData)
-    {
-      $arSumm = [
-        'iplan' => 0,
-        'fedplan' => 0,
-        'regplan' => 0,
-        'munplan' => 0,
-        'ifakt' => 0,
-        'fedfakt' => 0,
-        'regfakt' => 0,
-        'munfakt' => 0,
+      if ($node_type === 'razdel_napravleniya')
+      {
+        $budget_data = $budget_service->getBudgetDataMeropr($podrazdel);
+      }
+      $merpr_count = 0;
+      $arYearsData = [];
+      foreach ($budget_data as $arRow)
+      {
+        foreach ($arRow as $obData)
+        {
+          $arData = (array)$obData;
+          $arYearsData[$arData['year']]['data'][] = $arData;
+        }
+      }
+      foreach ($arYearsData as $year => $arYData)
+      {
+        $arSumm = [
+          'iplan' => 0,
+          'fedplan' => 0,
+          'regplan' => 0,
+          'munplan' => 0,
+          'ifakt' => 0,
+          'fedfakt' => 0,
+          'regfakt' => 0,
+          'munfakt' => 0,
+        ];
+        foreach ($arYData['data'] as $arRow)
+        {
+          if ($arRow['extence_fed_plan']==0 && $arRow['extence_reg_plan']==0 && $arRow['extence_mun_plan']==0) {
+            if (mb_substr($arRow['dop_fk'], 0, 1)==8) {
+              $arRow['extence_fed_plan'] = $arRow['extence_plan'];
+            } elseif (mb_substr($arRow['dop_fk'], 0, 1)==6 || mb_substr($arRow['dop_fk'], 0, 1)==9) {
+              $arRow['extence_reg_plan'] = $arRow['extence_plan'];
+            } else {
+              $arRow['extence_mun_plan'] = $arRow['extence_plan'];
+            }
+          }
+          if ($arRow['income_fed_fact']==0 && $arRow['income_reg_fact']==0 && $arRow['income_mun_fact']==0) {
+            if (mb_substr($arRow['dop_fk'], 0, 1)==8) {
+              $arRow['income_fed_fact'] = $arRow['income_fact'];
+            } elseif (mb_substr($arRow['dop_fk'], 0, 1)==6 || mb_substr($arRow['dop_fk'], 0, 1)==9) {
+              $arRow['income_reg_fact'] = $arRow['income_fact'];
+            } else {
+              $arRow['income_mun_fact'] = $arRow['income_fact'];
+            }
+          }
+          $arSumm['ifakt'] += $arRow['extence_plan'];
+          $arSumm['fedfakt'] += $arRow['extence_fed_plan'];
+          $arSumm['regfakt'] += $arRow['extence_reg_plan'];
+          $arSumm['munfakt'] += $arRow['extence_mun_plan'];
+          $arSumm['iplan'] += $arRow['income_fact'];
+          $arSumm['fedplan'] += $arRow['income_fed_fact'];
+          $arSumm['regplan'] += $arRow['income_reg_fact'];
+          $arSumm['munplan'] += $arRow['income_mun_fact'];
+        }
+        foreach ($arSumm as $field => &$value)
+        {
+          $value = round($value / 1000000, 1);
+        }
+        $arYearsData[$year]['summ'] = $arSumm;
+      }
+
+      //dump($arYearsData);
+
+      $items[] = [
+        '#theme' => 'podrazdel_with_budget',
+        '#node' => $podrazdel,
+        '#budget_data' => $arYearsData,//$budget_data,
+        '#url' => $podrazdel->toUrl()->toString(),
+        '#count' => count($budget_data),
+        '#node_type' => $node_type
       ];
-      foreach ($arYData['data'] as $arRow)
-      {
-        if ($arRow['extence_fed_plan']==0 && $arRow['extence_reg_plan']==0 && $arRow['extence_mun_plan']==0) {
-          if (mb_substr($arRow['dop_fk'], 0, 1)==8) {
-            $arRow['extence_fed_plan'] = $arRow['extence_plan'];
-          } elseif (mb_substr($arRow['dop_fk'], 0, 1)==6 || mb_substr($arRow['dop_fk'], 0, 1)==9) {
-            $arRow['extence_reg_plan'] = $arRow['extence_plan'];
-          } else {
-            $arRow['extence_mun_plan'] = $arRow['extence_plan'];
-          }
-        }
-        if ($arRow['income_fed_fact']==0 && $arRow['income_reg_fact']==0 && $arRow['income_mun_fact']==0) {
-          if (mb_substr($arRow['dop_fk'], 0, 1)==8) {
-            $arRow['income_fed_fact'] = $arRow['income_fact'];
-          } elseif (mb_substr($arRow['dop_fk'], 0, 1)==6 || mb_substr($arRow['dop_fk'], 0, 1)==9) {
-            $arRow['income_reg_fact'] = $arRow['income_fact'];
-          } else {
-            $arRow['income_mun_fact'] = $arRow['income_fact'];
-          }
-        }
-        $arSumm['ifakt'] += $arRow['extence_plan'];
-        $arSumm['fedfakt'] += $arRow['extence_fed_plan'];
-        $arSumm['regfakt'] += $arRow['extence_reg_plan'];
-        $arSumm['munfakt'] += $arRow['extence_mun_plan'];
-        $arSumm['iplan'] += $arRow['income_fact'];
-        $arSumm['fedplan'] += $arRow['income_fed_fact'];
-        $arSumm['regplan'] += $arRow['income_reg_fact'];
-        $arSumm['munplan'] += $arRow['income_mun_fact'];
-      }
-      foreach ($arSumm as $field => &$value)
-      {
-        $value = round($value / 1000000, 1);
-      }
-      $arYearsData[$year]['summ'] = $arSumm;
     }
 
-    //dump($arYearsData);
-
-    $items[] = [
-      '#theme' => 'podrazdel_with_budget',
-      '#node' => $podrazdel,
-      '#budget_data' => $arYearsData,//$budget_data,
-      '#url' => $podrazdel->toUrl()->toString(),
-      '#count' => count($budget_data),
-      '#node_type' => $node_type
+    $build = [
+      '#entity_type' => 'node',
+      '#title' => $entity->getTitle(),
+      '#node' => $entity,
+      'podrazdely' => [
+        '#theme' => 'podrazdely_list',
+        '#items' => $items,
+        '#title' => 'Подразделы направления',
+      ],
     ];
   }
 
-  $build = [
-    '#entity_type' => 'node',
-    '#title' => $entity->getTitle(),
-    '#node' => $entity,
-    'podrazdely' => [
-      '#theme' => 'podrazdely_list',
-      '#items' => $items,
-      '#title' => 'Подразделы направления',
-    ],
+
+
+}
+
+function napr_podrazdely_preprocess_objects_on_meropriyatie(&$variables) {
+  $objects_render = $variables['objects'] ?? [];
+  $objects_data = [];
+  $map_points = []; // Для карты
+
+  foreach ($objects_render as $render_array) {
+    if (isset($render_array['#node'])) {
+      $node = $render_array['#node'];
+      $nid = $node->id();
+      $title = $node->getTitle();
+
+      // Получаем стоимость
+      $cost_raw = 0;
+      $cost_formatted = '';
+      if ($node->hasField('field_cost') && !$node->get('field_cost')->isEmpty()) {
+        $cost_value = $node->get('field_cost')->value;
+        $cost_clean = preg_replace('/[^0-9,]/', '', $cost_value);
+        $cost_clean = str_replace(',', '.', $cost_clean);
+        $cost_raw = floatval($cost_clean);
+        $cost_formatted = number_format($cost_raw, 2, '.', ' ');
+        if (substr($cost_formatted, -3) == '.00') {
+          $cost_formatted = substr($cost_formatted, 0, -3);
+        }
+      }
+
+      // Получаем срок
+      $srok = '';
+      if ($node->hasField('field_srok') && !$node->get('field_srok')->isEmpty()) {
+        $srok = $node->get('field_srok')->value;
+      }
+
+      // Получаем адрес
+      $address = '';
+      if ($node->hasField('field_address') && !$node->get('field_address')->isEmpty()) {
+        $address = $node->get('field_address')->value;
+      }
+
+      // Получаем координаты
+      $coords = '';
+      $coords_array = [];
+      if ($node->hasField('field_coords') && !$node->get('field_coords')->isEmpty()) {
+        $coords = $node->get('field_coords')->value;
+        // Разбираем координаты "56.843256, 60.562706" в массив [56.843256, 60.562706]
+        $coords_array = array_map('floatval', explode(',', $coords));
+      }
+
+      // Получаем изображения для галереи
+      $images = [];
+      if ($node->hasField('field_foto') && !$node->get('field_foto')->isEmpty()) {
+        foreach ($node->get('field_foto') as $image_item) {
+          $file = $image_item->entity;
+          if ($file) {
+            $images[] = [
+              'url' => $file->createFileUrl(),
+              'alt' => $image_item->alt ?: $title,
+              'fid' => $file->id(),
+            ];
+          }
+        }
+      }
+
+      $objects_data[] = [
+        'nid' => $nid,
+        'title' => $title,
+        'cost_raw' => $cost_raw,
+        'cost_formatted' => $cost_formatted,
+        'srok' => $srok,
+        'address' => $address,
+        'images' => $images,
+      ];
+
+      // Добавляем точку для карты, если есть координаты
+      if (!empty($coords_array) && count($coords_array) == 2) {
+        $map_points[] = [
+          'nid' => $nid,
+          'title' => $title,
+          'coords' => $coords_array,
+          'srok' => $srok,
+          'address' => $address,
+        ];
+      }
+    }
+  }
+
+  // Сортируем объекты
+  usort($objects_data, function($a, $b) {
+    return strcmp($a['title'], $b['title']);
+  });
+
+  $variables['objects'] = $objects_data;
+  $variables['map_points'] = $map_points;
+  $variables['meropriyatie_title'] = $title; //$variables['meropriyatie']->getTitle();
+
+  // Передаём данные для карты в drupalSettings
+  $variables['#attached']['drupalSettings']['objects_map'] = [
+    'points' => $map_points,
+    'center' => !empty($map_points) ? $map_points[0]['coords'] : [56.842770, 60.807811],
+    'title' => $variables['meropriyatie_title'],
   ];
 
-  /*
-  function napr_podrazdely_system_breadcrumb_build(\Drupal\Core\Routing\RouteMatchInterface $route_match) {
-    // Получаем текущий узел
-    $node = $route_match->getParameter('node');
-    dump($node);
 
-    if (!$node instanceof \Drupal\node\NodeInterface) {
-      return NULL;
-    }
-
-    $breadcrumb = new \Drupal\Core\Breadcrumb\Breadcrumb();
-    $links = [];
-
-    // Ссылка на главную
-    $links[] = \Drupal\Core\Link::createFromRoute('Главная', '<front>');
-
-    // Для страницы направления
-    if ($node->bundle() === 'napravlenie') {
-      $breadcrumb->setLinks($links);
-      $breadcrumb->addCacheContexts(['url.path']);
-      return $breadcrumb;
-    }
-
-    // Для страницы подраздела (razdel_napravleniya)
-    if ($node->bundle() === 'razdel_napravleniya') {
-      $parent_napravlenie = $node->get('field_napravlenie')->entity;
-      if ($parent_napravlenie) {
-        $links[] = \Drupal\Core\Link::fromTextAndUrl(
-          $parent_napravlenie->getTitle(),
-          $parent_napravlenie->toUrl()
-        );
-      }
-
-      $breadcrumb->setLinks($links);
-      $breadcrumb->addCacheContexts(['url.path']);
-      return $breadcrumb;
-    }
-
-    // Для страницы мероприятия
-    if ($node->bundle() === 'meropriyatie') {
-      $parent_podrazdel = $node->get('field_section')->entity;
-      if ($parent_podrazdel) {
-        $parent_napravlenie = $parent_podrazdel->get('field_napravlenie')->entity;
-        if ($parent_napravlenie) {
-          $links[] = \Drupal\Core\Link::fromTextAndUrl(
-            $parent_napravlenie->getTitle(),
-            $parent_napravlenie->toUrl()
-          );
-        }
-
-        $links[] = \Drupal\Core\Link::fromTextAndUrl(
-          $parent_podrazdel->getTitle(),
-          $parent_podrazdel->toUrl()
-        );
-      }
-
-      $breadcrumb->setLinks($links);
-      $breadcrumb->addCacheContexts(['url.path']);
-      return $breadcrumb;
-    }
-
-    return NULL;
-  }
+  $variables['hierarchy'] = napr_podrazdely_get_full_hierarchy();
 
 
+  $meropriyatie = $variables['meropriyatie'];
+  $variables['meropriyatie_title'] = $meropriyatie->getTitle();
 
-  function napr_podrazdely_system_breadcrumb_alter(\Drupal\Core\Breadcrumb\Breadcrumb &$breadcrumb, \Drupal\Core\Routing\RouteMatchInterface $route_match, array $context) {
-    // Получаем текущий узел
-    $node = $route_match->getParameter('node');
-    dump($node);
-    if (!$node instanceof \Drupal\node\NodeInterface) {
-      return;
-    }
-
-    // Для страницы направления
-    if ($node->bundle() === 'napravlenie') {
-      $links = $breadcrumb->getLinks();
-      dump($links);
-      // Оставляем только "Главная", добавляем текущий заголовок
-      $breadcrumb->setLinks($links);
-      return;
-    }
-
-    // Для страницы подраздела (razdel_napravleniya)
-    if ($node->bundle() === 'razdel_napravleniya') {
-      $links = [];
-
-      // Ссылка на главную
-      $links[] = \Drupal\Core\Link::createFromRoute('Главная', '<front>');
-
-      // Получаем родительское направление
-      $parent_napravlenie = $node->get('field_napravlenie')->entity;
-      if ($parent_napravlenie) {
-        $links[] = \Drupal\Core\Link::fromTextAndUrl(
-          $parent_napravlenie->getTitle(),
-          $parent_napravlenie->toUrl()
-        );
-      }
-
-      // Текущий подраздел (без ссылки)
-      $breadcrumb = new \Drupal\Core\Breadcrumb\Breadcrumb();
-      $breadcrumb->setLinks($links);
-      $breadcrumb->addCacheContexts(['url.path']);
-      return;
-    }
-
-    // Для страницы мероприятия (meropriyatie)
-    if ($node->bundle() === 'meropriyatie') {
-      $links = [];
-
-      // Ссылка на главную
-      $links[] = \Drupal\Core\Link::createFromRoute('Главная', '<front>');
-
-      // Получаем родительский подраздел
-      $parent_podrazdel = $node->get('field_section')->entity;
-      if ($parent_podrazdel) {
-        // Получаем направление через подраздел
-        $parent_napravlenie = $parent_podrazdel->get('field_napravlenie')->entity;
-        if ($parent_napravlenie) {
-          $links[] = \Drupal\Core\Link::fromTextAndUrl(
-            $parent_napravlenie->getTitle(),
-            $parent_napravlenie->toUrl()
-          );
-        }
-
-        $links[] = \Drupal\Core\Link::fromTextAndUrl(
-          $parent_podrazdel->getTitle(),
-          $parent_podrazdel->toUrl()
-        );
-      }
-
-      // Текущее мероприятие (без ссылки)
-      $breadcrumb = new \Drupal\Core\Breadcrumb\Breadcrumb();
-      $breadcrumb->setLinks($links);
-      $breadcrumb->addCacheContexts(['url.path']);
-      return;
+  // Получаем раздел, к которому привязано мероприятие
+  $section_title = '';
+  $section_url = '';
+  if ($meropriyatie->hasField('field_section') && !$meropriyatie->get('field_section')->isEmpty()) {
+    $section_id = $meropriyatie->get('field_section')->target_id;
+    $section = \Drupal::entityTypeManager()->getStorage('node')->load($section_id);
+    if ($section) {
+      $section_title = $section->getTitle();
+      $section_url = $section->toUrl()->toString();
     }
   }
-  */
+
+  $variables['section_title'] = $section_title;
+  $variables['section_url'] = $section_url;
+
+}
 
 
-  /*
-  $original = $build;
-  $build = [];
-  $build['#entity_type'] = $original['#entity_type'] ?? 'node';
-  $build['#'] = $original['#'] ?? [];
-  $build['#title'] = $entity->getTitle();
-  $build['#node'] = $entity;
+/**
+ * Получает всю иерархию: направления -> разделы -> мероприятия
+ */
+function napr_podrazdely_get_full_hierarchy() {
+  $tree = [];
 
-  if (empty($podrazdely)) {
-    $build['podrazdely'] = [
-      '#markup' => '<p>Нет подразделов в этом направлении.</p>',
+  // Получаем все направления
+  $napravleniya = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->loadByProperties([
+      'type' => 'napravlenie',
+      'status' => 1,
+    ]);
+
+  // Сортируем направления по названию
+  uasort($napravleniya, function($a, $b) {
+    return $a->getTitle() <=> $b->getTitle();
+  });
+
+  foreach ($napravleniya as $napravlenie) {
+    $napravlenie_item = [
+      'nid' => $napravlenie->id(),
+      'title' => $napravlenie->getTitle(),
+      'url' => $napravlenie->toUrl()->toString(),
+      'type' => 'napravlenie',
+      'children' => [],
     ];
-    return;
-  }
 
-  $items = [];
-  foreach ($podrazdely as $podrazdel) {
-    $count = \Drupal::entityTypeManager()
+    // Получаем разделы этого направления
+    $razdely = \Drupal::entityTypeManager()
       ->getStorage('node')
-      ->getQuery()
-      ->accessCheck(TRUE)
-      ->condition('type', 'meropriyatie')
-      ->condition('field_section', $podrazdel->id())
-      ->count()
-      ->execute();
-    //$view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
-    //$items[] = $view_builder->view($podrazdel, 'teaser');
-    $items[] = [
-      '#theme' => 'podrazdel_with_count',
-      '#node' => $podrazdel,
-      '#count' => $count,
-      '#url' => $podrazdel->toUrl(),
-    ];
+      ->loadByProperties([
+        'type' => 'razdel_napravleniya',
+        'field_napravlenie' => $napravlenie->id(),
+        'status' => 1,
+      ]);
+
+    // Сортируем разделы по названию
+    uasort($razdely, function($a, $b) {
+      return $a->getTitle() <=> $b->getTitle();
+    });
+
+    foreach ($razdely as $razdel) {
+      $razdel_item = [
+        'nid' => $razdel->id(),
+        'title' => $razdel->getTitle(),
+        'url' => $razdel->toUrl()->toString(),
+        'type' => 'razdel',
+        'children' => [],
+      ];
+
+      // Получаем мероприятия этого раздела
+      $meropriyatiya = \Drupal::entityTypeManager()
+        ->getStorage('node')
+        ->loadByProperties([
+          'type' => 'meropriyatie',
+          'field_section' => $razdel->id(),
+          'status' => 1,
+        ]);
+
+      // Сортируем мероприятия по названию
+      uasort($meropriyatiya, function($a, $b) {
+        return $a->getTitle() <=> $b->getTitle();
+      });
+
+      foreach ($meropriyatiya as $meropriyatie) {
+        $razdel_item['children'][] = [
+          'nid' => $meropriyatie->id(),
+          'title' => $meropriyatie->getTitle(),
+          'url' => $meropriyatie->toUrl()->toString(),
+          'type' => 'meropriyatie',
+        ];
+      }
+
+      $napravlenie_item['children'][] = $razdel_item;
+    }
+
+    $tree[] = $napravlenie_item;
   }
-  dump($items);
 
-  $build['podrazdely'] = [
-    '#theme' => 'podrazdely_list',
-    '#items' => $items,
-  ];
-  */
+  return $tree;
+}
 
+function napr_podrazdely_preprocess_objects_on_meropriyatie__(&$variables) {
+  $objects_render = $variables['objects'] ?? [];
+  $objects_data = [];
+
+  foreach ($objects_render as $render_array) {
+    // Получаем nid из рендер массива
+    if (isset($render_array['#node'])) {
+      $node = $render_array['#node'];
+      $nid = $node->id();
+
+      // Собираем данные для сортировки и отображения
+      $title = $node->getTitle();
+
+      // Получаем стоимость (очищаем от пробелов и преобразуем в число)
+      $cost_raw = 0;
+      $cost_formatted = '';
+      if ($node->hasField('field_cost') && !$node->get('field_cost')->isEmpty()) {
+        $cost_value = $node->get('field_cost')->value;
+        // Удаляем пробелы и заменяем запятую на точку
+        $cost_clean = preg_replace('/[^0-9,]/', '', $cost_value);
+        $cost_clean = str_replace(',', '.', $cost_clean);
+        $cost_raw = floatval($cost_clean);
+        // Форматируем с пробелами каждые 3 цифры
+        $cost_formatted = number_format($cost_raw, 2, '.', ' ');
+        // Убираем .00 если копеек нет
+        if (substr($cost_formatted, -3) == '.00') {
+          $cost_formatted = substr($cost_formatted, 0, -3);
+        }
+      }
+
+      // Получаем срок реализации
+      $srok = '';
+      if ($node->hasField('field_srok') && !$node->get('field_srok')->isEmpty()) {
+        $srok = $node->get('field_srok')->value;
+      }
+
+      // Получаем адрес
+      $address = '';
+      if ($node->hasField('field_address') && !$node->get('field_address')->isEmpty()) {
+        $address = $node->get('field_address')->value;
+      }
+
+      // Получаем изображения
+      $images = [];
+      if ($node->hasField('field_foto') && !$node->get('field_foto')->isEmpty()) {
+        foreach ($node->get('field_foto') as $image_item) {
+          $file = $image_item->entity;
+          if ($file) {
+            $images[] = [
+              'url' => $file->createFileUrl(),
+              'alt' => $image_item->alt ?: $title,
+              'fid' => $file->id(),
+            ];
+          }
+        }
+      }
+
+      $objects_data[] = [
+        'nid' => $nid,
+        'title' => $title,
+        'cost_raw' => $cost_raw,
+        'cost_formatted' => $cost_formatted,
+        'srok' => $srok,
+        'address' => $address,
+        'images' => $images,
+      ];
+    }
+  }
+
+  // Сортируем объекты (по умолчанию по наименованию)
+  usort($objects_data, function($a, $b) {
+    return strcmp($a['title'], $b['title']);
+  });
+
+  $variables['objects'] = $objects_data;
 }

@@ -1,0 +1,108 @@
+<section class='map-block' id='map-block'>
+  <div class='tab-map'>
+    <div class='info-tab-map'>
+      <div class='suggest-tab'>Выберите мероприятие</div>
+      <div class='selected-tab'>
+        {% if section_title %}
+          {{ section_title }}: <span>«{{ meropriyatie_title }}», Мероприятие</span>
+        {% else %}
+          <span>«{{ meropriyatie_title }}», Мероприятие</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class='hid-info-tab'>
+      <div class='big-info-tab'>
+        <div class='all-object-tab need-color' onclick="window.location = '?all_objects'">Все объекты</div>
+        {{ include('@napr_podrazdely/hierarchy-nav.html.twig') }}
+      </div>
+    </div>
+  </div>
+</section>
+{%
+  set classes = [
+  'telo-nac',
+  not objects ? 'telo-nac--empty',
+]
+%}
+
+<section{{ attributes.addClass(classes) }}>
+  <a name="sort"></a>
+
+  {# Блок сортировки #}
+  {% if objects|length > 1 %}
+    <div class="sorting-block" name="sorting" data-val="Наименованию">
+      <div class="select-title" data-default="Наименованию">
+        <div>Сортировать по: </div>Наименованию
+      </div>
+      <div class="select-content">
+        <input class="select-input" type="radio" name="sort" />
+        <label class="select-label sort" rel="name">Наименованию</label>
+        <input class="select-input" type="radio" name="sort" />
+        <label class="select-label sort" rel="price">Сметной стоимости</label>
+        <input class="select-input" type="radio" name="sort" />
+        <label class="select-label sort" rel="srok">Сроку реализации</label>
+      </div>
+    </div>
+  {% endif %}
+
+  {# Таблица объектов #}
+  <div class="over-block-object">
+    <div class="table-all-object">
+      <table class="all-object no-login" cellspacing="0">
+        <thead>
+        <tr>
+          <th>Наименование объекта</th>
+          <th>Сметная стоимость</th>
+          <th>Срок реализации</th>
+          <th>Адрес</th>
+          <th>Материалы</th>
+          <th>Заключенные контракты</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for object_row in objects %}
+          <tr class="object-row" data-name="{{ object_row.title|lower }}"
+              data-price="{{ object_row.cost_raw }}"
+              data-srok="{{ object_row.srok }}">
+            <td class="name-object">
+              <span>{{ object_row.title }}</span>
+            </td>
+            <td class="price-object">{{ object_row.cost_formatted }} ₽</td>
+            <td class="term-object">
+              <span>{{ object_row.srok }}</span>
+            </td>
+            <td class="address-object">{{ object_row.address }}</td>
+            <td class="material-object">
+              {% if object_row.images is not empty %}
+                <span>
+                    <a href="#" class="material-object-js" rel="obj_{{ object_row.nid }}">
+                      дополнительные сведения
+                    </a>
+                  </span>
+                <div class="img_hidden" rel="obj_{{ object_row.nid }}">
+                  {% for image in object_row.images %}
+                    <a href="{{ image.url }}"
+                       class="galleryobj_{{ object_row.nid }}"
+                       data-fancybox-group="galleryobj_{{ object_row.nid }}">
+                      <img src="{{ image.url }}" alt="{{ image.alt }}" />
+                    </a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </td>
+            <td class="contract-object">
+              {# Если есть контракты, можно добавить позже #}
+            </td>
+          </tr>
+        {% else %}
+          <tr class="no-objects">
+            <td colspan="6" style="text-align: center; padding: 40px;">
+              Объекты не найдены
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

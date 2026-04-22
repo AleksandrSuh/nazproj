@@ -21,6 +21,7 @@
 #kultura{background-color:var(--kultura-bg);}
 #node1{background-color:var(--housing-bg);}
 #node2{background-color:var(--demographics-bg);}
+#node8{background-color:var(--eco-bg);}
 #roads{background-color:var(--roads-bg);}
 #obrazovanie{background-color:var(--obrazovanie-bg);}
 
@@ -74,4 +75,7 @@ img {
   background: #005a8c;
   color: white;
   text-decoration: none;
+}
+.sorting-block {
+  margin-top: 30px;
 }
