@@ -1,0 +1,7 @@
+name: Custom News
+type: module
+description: 'Вывод новостей'
+core_version_requirement: ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:node

@@ -1,0 +1,119 @@
+<?php
+/**
+ * @file
+ * Модуль для отображения новостей с сайта-донора.
+ */
+
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+function mynews_block_info() {
+  $blocks = [];
+
+  $blocks['donor_news'] = [
+    'info' => t('Новости с сайта-донора'),
+    'cache' => DRUPAL_NO_CACHE, // Отключаем кэширование
+  ];
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function mynews_block_view($delta = '') {
+  if ($delta == 'donor_news') {
+    $block = [];
+    $block['subject'] = t('Последние новости');
+    $block['content'] = mynews_display_news_block();
+    return $block;
+  }
+}
+
+/**
+ * Внутренняя функция для отображения новостей.
+ */
+function mynews_display_news_block() {
+  try {
+    /** @var \Drupal\mynews\NewsFetcher $fetcher */
+    $fetcher = \Drupal::service('mynews.fetcher');
+    $news = $fetcher->getCachedNews();
+
+    if (empty($news)) {
+      return [
+        '#markup' => '<p>Новости временно недоступны</p>',
+      ];
+    }
+
+    return [
+      '#theme' => 'mynews_donor_news',
+      '#news' => $news,
+    ];
+
+    $items = [];
+    foreach ($news as $item) {
+      $title = htmlspecialchars($item['title'] ?? 'Без заголовка');
+      $link = htmlspecialchars($item['link'] ?? '#');
+      $date = htmlspecialchars($item['date'] ?? '');
+
+      $items[] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#attributes' => ['class' => ['nws']],
+        /*'#value' => '<span class="news-date">' . $date . '</span> '
+          . '<a href="' . $link . '" target="_blank" rel="noopener noreferrer">' . $title . '</a>',*/
+        '#value' => '<p class="dt">' . $date . '</p>
+			<a href="' . $link . '" target="_blank"><p>' . $title . '</p></a>'
+      ];
+    }
+
+    return [
+      '#theme' => 'item_list',
+      '#items' => $items,
+      '#title' => t('Последние новости'),
+      '#attributes' => ['class' => ['donor-news-list']],
+    ];
+
+  } catch (Exception $e) {
+    \Drupal::logger('mynews')->error('Ошибка отображения новостей: @error', ['@error' => $e->getMessage()]);
+    return [
+      '#markup' => '<p>Ошибка загрузки новостей</p>',
+    ];
+  }
+}
+
+function mynews_theme() {
+  return [
+    'mynews_donor_news' => [
+      'variables' => [
+        'news' => [],
+      ],
+      'template' => 'mynews-donor-news',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_cron().
+ *
+ * Выполняется при каждом запуске cron Drupal.
+ * ВАЖНО: Это будет срабатывать каждый раз при запуске cron,
+ * независимо от настроенной периодичности.
+ */
+function mynews_cron() {
+  try {
+    /** @var \Drupal\mynews\NewsFetcher $fetcher */
+    $fetcher = \Drupal::service('mynews.fetcher');
+
+    $result = $fetcher->updateNews();
+
+    if ($result) {
+      \Drupal::logger('mynews')->info('Новости успешно обновлены');
+    } else {
+      \Drupal::logger('mynews')->warning('Не удалось обновить новости');
+    }
+
+  } catch (Exception $e) {
+    \Drupal::logger('mynews')->error('Ошибка в cron: @error', ['@error' => $e->getMessage()]);
+  }
+}

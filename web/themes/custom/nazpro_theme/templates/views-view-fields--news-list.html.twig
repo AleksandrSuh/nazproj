@@ -1,25 +1,16 @@
-{#
-/**
- * @file
- * Шаблон для полей одной новости
- */
-#}
-{% set news_url = fields.view_node.content|striptags|trim %}
 
-<article class='one-news'>
-  <a href="{{ news_url }}" class='pic-news'>
-    {{ fields.field_news_image.content }}
-  </a>
-
-  <a href="{{ news_url }}" class='name-news'>
-    {{ fields.title.content }}
-  </a>
-
-  <div class='date-news'>
-    {{ fields.field_news_date.content }}
-  </div>
-
-  <div class='anons-news'>
-    {{ fields.field_news_summary.content|default(fields.body.content|striptags|slice(0, 200)) }}
-  </div>
-</article>
+{% set news_url = fields.view_node.content %}
+{% set img_tag = fields.field_news_image.content %}
+{% set img_src = img_tag|split('src="')|last|split('"')|first %}
+<a href="{{ news_url }}" class="pic-news">
+    <img src="{{ img_src }}" alt="">
+</a>
+<a href="{{ news_url }}" class="name-news">
+  {{ fields.title.content }}
+</a>
+<div class="date-news">
+  {{ fields.field_news_date.original_value.value|date('d.m.Y') }}
+</div>
+<div class="anons-news">
+  {{ fields.field_news_summary.content }}
+</div>

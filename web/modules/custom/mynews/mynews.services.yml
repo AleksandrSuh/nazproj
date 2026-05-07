@@ -1,0 +1,4 @@
+services:
+  mynews.fetcher:
+    class: Drupal\mynews\NewsFetcher
+    arguments: []

@@ -1,0 +1,22 @@
+<div class="news-page">
+  <h1>Новости</h1>
+
+  {% for node in nodes %}
+    <article class="one-news">
+      <a href="{{ path('entity.node.canonical', {'node': node.id}) }}" class="pic-news">
+        {% if node.field_news_image.entity %}
+          <img src="{{ file_url(node.field_news_image.entity.uri.value) }}" alt="{{ node.title.value }}">
+        {% endif %}
+      </a>
+      <a href="{{ path('entity.node.canonical', {'node': node.id}) }}" class="name-news">
+        {{ node.title.value }}
+      </a>
+      <div class="date-news">
+        {{ node.field_news_date.value|date('d.m.Y') }}
+      </div>
+      <div class="anons-news">
+        {{ node.field_news_summary.value|striptags|slice(0, 300) }}
+      </div>
+    </article>
+  {% endfor %}
+</div>

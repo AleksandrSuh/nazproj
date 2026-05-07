@@ -1,0 +1,38 @@
+{# <section class='telo-nac'>
+  <div class='zag-object'><h1>Новости</h1></div>
+  <section class="telo-nac"><div id="breadcrumbs">
+      <a href="/" class="one-breadcrumbs">Главная</a>/
+      <span class="one-breadcrumbs">Новости</span></div>
+  </section>
+</section>
+<section class='telo-nac'>
+  <article class='all-news'>
+{{  rows }}
+  </article>
+</section> #}
+<div class="news-page">
+  <h1 class="news-page__title">{{ title }}</h1>
+
+  {% for row in rows %}
+    {% set result = row['#row'] %}
+
+    <article class="one-news">
+      <a href="/news/{{ result.nid }}" class="pic-news">
+        {% if result.field_news_image_target_id %}
+          <img src="/sites/default/files/styles/medium/public/{{ result.field_news_image_target_id }}.jpg" alt="">
+        {% endif %}
+      </a>
+      <a href="/news/{{ result.nid }}" class="name-news">
+        {{ result.title }}
+      </a>
+      <div class="date-news">
+        {{ result.field_news_date_value|date('d.m.Y') }}
+      </div>
+      <div class="anons-news">
+        {{ result.field_news_summary_value|striptags|slice(0, 300) }}
+      </div>
+    </article>
+  {% endfor %}
+
+  {{ pager }}
+</div>

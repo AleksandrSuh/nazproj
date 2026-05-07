@@ -1,0 +1,16 @@
+custom_news.list:
+  path: '/news'
+  defaults:
+    _controller: '\Drupal\custom_news\Controller\NewsController::list'
+    _title: 'Новости'
+  requirements:
+    _permission: 'access content'
+
+custom_news.view:
+  path: '/news/{node}'
+  defaults:
+    _controller: '\Drupal\custom_news\Controller\NewsController::view'
+    _title_callback: '\Drupal\custom_news\Controller\NewsController::getTitle'
+  requirements:
+    node: \d+
+    _entity_access: 'node.view'

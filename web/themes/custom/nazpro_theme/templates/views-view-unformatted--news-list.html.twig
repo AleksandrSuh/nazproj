@@ -1,37 +1,17 @@
+<section class='telo-nac'>
+  <div class='zag-object'><h1>Новости</h1></div>
+  <section class="telo-nac"><div id="breadcrumbs">
+      <a href="/" class="one-breadcrumbs">Главная</a>/
+      <span class="one-breadcrumbs">Новости</span></div>
+  </section>
+</section>
+<section class='telo-nac'>
+  <article class='all-news'>
+
 {% for row in rows %}
-  {% set node = row._entity %}
-
-  {# Получаем URL новости #}
-  {% set news_url = path('entity.node.canonical', {'node': node.id}) %}
-
-  <article class='one-news'>
-    {# Картинка #}
-    {% if node.field_news_image.entity %}
-      {% set image = node.field_news_image.entity %}
-      <a href="{{ news_url }}" class='pic-news'>
-        <img src="{{ image.uri.value }}" alt="{{ node.title.value }}">
-      </a>
-    {% endif %}
-
-    {# Заголовок #}
-    <a href="{{ news_url }}" class='name-news'>
-      {{ node.title.value }}
-    </a>
-
-    {# Дата #}
-    <div class='date-news'>
-      {{ node.field_news_date.value|date('d.m.Y') }}
-    </div>
-
-    {# Анонс #}
-    <div class='anons-news'>
-      {% if node.field_news_summary.value %}
-        {{ node.field_news_summary.value|raw }}
-      {% elseif node.body.value %}
-        {{ node.body.value|striptags|slice(0, 200) }}...
-      {% endif %}
-    </div>
+  <article class="one-news">
+    {{ row.content }}
   </article>
-
-  {# { row.content } #}
 {% endfor %}
+  </article>
+</section>

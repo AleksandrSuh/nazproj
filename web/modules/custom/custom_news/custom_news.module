@@ -1,0 +1,14 @@
+<?php
+
+function custom_news_theme() {
+  return [
+    'news_list' => [
+      'variables' => ['nodes' => []],
+      'template' => 'news-list',
+    ],
+    'news_detail' => [
+      'variables' => ['node' => NULL],
+      'template' => 'news-detail',
+    ],
+  ];
+}

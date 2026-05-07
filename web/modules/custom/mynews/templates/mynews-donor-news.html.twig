@@ -1,0 +1,21 @@
+{#
+/**
+ * @file
+ * Шаблон для отображения новостей с сайта-донора.
+ *
+ * Доступные переменные:
+ * - news: массив новостей
+ */
+#}
+{% if news %}
+    {% for item in news %}
+      <div class="nws">
+        <p class="dt">{{ item.date }}</p>
+        <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer">
+          <p>{{ item.title }}</p>
+        </a>
+      </div>
+    {% endfor %}
+{% else %}
+  <p>Новости временно недоступны</p>
+{% endif %}

@@ -1,0 +1,5 @@
+name: 'Новости Екатеринбург.рф'
+type: module
+description: 'Получение и отображение новостей с внешнего сайта'
+core_version_requirement: ^11
+package: Custom
