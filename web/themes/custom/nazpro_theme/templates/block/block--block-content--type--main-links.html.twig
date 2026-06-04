@@ -1,0 +1,21 @@
+<section class='slider-glav-big'>
+  <div class='telo-nac'>
+    <div class='slider-gl'>
+      <article class='slider-track-gl'>
+      {% for key, item in content.field_link %}
+        {% if key|first != '#' %}
+          <a href="{{ item['#url'] }}" class='slide-gl' target="_blank">
+            {% set image_uri = content.field_img[key]['#item'].entity.uri.value %}
+            <img src="{{ file_url(image_uri) }}"
+              alt=""
+              title="" />
+            <span class='name-slide-gl'>{{ item['#title'] }}</span>
+          </a>
+        {% endif %}
+      {% endfor %}
+      </article>
+    </div>
+  </div>
+  <div class='shadow-right'></div>
+  <div class='shadow-left'></div>
+</section>

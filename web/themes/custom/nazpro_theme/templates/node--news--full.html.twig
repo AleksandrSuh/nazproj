@@ -1,0 +1,25 @@
+<section class='telo-nac'>
+  <section class='telo-nac'>
+    <div class='text-pic-news'>
+      <div class='left-news-vn'>
+        <div class='develop-text'>
+          {{ processed_body|raw }}
+        </div>
+        <div class='buts-news'>
+
+          <!--a href="/news/spektakl_master_klass_marafon_kuda_poyti_v_vykhodnye/">Предыдущая новость</a-->
+        </div>
+      </div>
+      <div class='oic-news-vn'>
+        {% if content.field_news_image %}
+        <img
+          src="{{ file_url(node.field_news_image.entity.uri.value) }}"
+          alt=""
+          title=""
+        />
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  <br></section>
+

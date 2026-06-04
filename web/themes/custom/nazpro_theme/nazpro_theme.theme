@@ -176,6 +176,22 @@ function nazpro_theme_preprocess_views_view__projects__block_2(&$variables) {
   }
 }
 
+
+/**
+ * Implements template_preprocess_node().
+ */
+function nazpro_theme_preprocess_node(&$variables) { // если в теле новости попадают картинки, то показывать их будем с сайта-донора, без скачивания
+  if ($variables['node']->bundle() == 'news' && $variables['view_mode'] == 'full') {
+    $node = $variables['node'];
+    $body_value = $node->get('field_body')->value;
+
+    $donor_site = 'https://xn--80acgfbsl1azdqr.xn--p1ai/';
+    $body_value = str_replace('src="', 'src="'.$donor_site, $body_value);
+
+    $variables['processed_body'] = $body_value;
+  }
+}
+
 function nazpro_theme_preprocess_node__razdel_napravleniya(&$variables) {
 
   //dump(array_keys($variables));

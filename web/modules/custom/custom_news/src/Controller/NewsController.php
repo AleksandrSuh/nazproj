@@ -15,7 +15,7 @@ class NewsController extends ControllerBase {
       ->condition('type', 'news')
       ->condition('status', 1)
       ->sort('created', 'DESC')
-      ->range(0, 10);
+      ->range(0, 20);
 
     $nids = $query->execute();
     $nodes = Node::loadMultiple($nids);
@@ -27,6 +27,11 @@ class NewsController extends ControllerBase {
   }
 
   public function view($node) {
+
+    if ($node->bundle() != 'news') {
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
+    }
+
     return [
       '#theme' => 'news_detail',
       '#node' => $node,

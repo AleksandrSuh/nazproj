@@ -4,7 +4,7 @@ namespace Drupal\mynews;
 
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
-
+use Drupal\pathauto\PathautoState;
 /**
  * Класс для получения новостей с сайта-донора и сохранения в БД
  */
@@ -52,11 +52,11 @@ class NewsFetcher {
   /**
    * Получение HTML страницы новостей
    */
-  private function fetchHtml(): ?string {
+  private function fetchHtml(string $url): ?string {
     $ch = curl_init();
 
     curl_setopt_array($ch, [
-      CURLOPT_URL => $this->donorUrl,
+      CURLOPT_URL => $url,
       CURLOPT_RETURNTRANSFER => true,
       CURLOPT_FOLLOWLOCATION => true,
       CURLOPT_MAXREDIRS => 5,
@@ -93,7 +93,7 @@ class NewsFetcher {
 
     $dom = new \DOMDocument();
     libxml_use_internal_errors(true);
-    $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+    $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
     libxml_clear_errors();
 
     $xpath = new \DOMXPath($dom);
@@ -104,7 +104,7 @@ class NewsFetcher {
     $this->log("Найдено блоков новостей: " . $newsItems->length, 'INFO');
 
     foreach ($newsItems as $item) {
-      if (count($news) >= 1) break;
+      if (count($news) >= 3) break;
 
       // === ПОЛУЧАЕМ ССЫЛКУ И ЗАГОЛОВОК ===
       $linkNode = $xpath->query(".//a[contains(@class, 'news-link')]", $item);
@@ -122,6 +122,11 @@ class NewsFetcher {
         }
       }
 
+      if ($this->newsExists($donorUrl)) {
+        $this->log("Новость уже существует: " . $title, 'INFO');
+        continue;
+      }
+
       // === ПОЛУЧАЕМ ДАТУ ===
       $dateNode = $xpath->query(".//span[contains(@class, 'news-date')]", $item);
       $date = $dateNode->length > 0 ? trim($dateNode->item(0)->nodeValue) : '';
@@ -130,43 +135,139 @@ class NewsFetcher {
       $summaryNode = $xpath->query(".//p", $item);
       $summary = $summaryNode->length > 0 ? trim($summaryNode->item(0)->nodeValue) : '';
 
-      // === ПОЛУЧАЕМ ССЫЛКУ НА КАРТИНКУ ===
-      // Картинка в background: url(/media/rootnews/b/9/..._275x_.jpg)
-      $imgNode = $xpath->query(".//div[contains(@class, 'news-img-holder')]", $item);
-      $imageUrl = '';
 
-      if ($imgNode->length > 0) {
-        $style = $imgNode->item(0)->getAttribute('style');
-        // Ищем url(...) в style
-        if (preg_match('/url\(([^)]+)\)/', $style, $matches)) {
-          $imageUrl = trim($matches[1], '\'"'); // Убираем кавычки если есть
-          // Преобразуем относительную ссылку в абсолютную
-          if (strpos($imageUrl, 'http') !== 0) {
-            $imageUrl = 'https://xn--80acgfbsl1azdqr.xn--p1ai' . $imageUrl;
-          }
-        }
-      }
-
-      // === ПОЛНЫЙ ТЕКСТ НОВОСТИ ПОКА ПРОПУСКАЕМ (будет позже) ===
-      // Для получения полного текста нужно будет сделать отдельный запрос к странице новости
-      // $body = $this->fetchFullNewsText($donorUrl);
+      // === ПОЛНЫЙ НОВОСТ
+      $fullData = $this->fetchFullNewsData($donorUrl);
 
       if (!empty($title) && !empty($donorUrl)) {
         $news[] = [
           'title' => $title,
           'donor_url' => $donorUrl,
-          'date' => $date,           // для field_news_date
-          'summary' => $summary,     // для field_news_summary
-          'image_url' => $imageUrl,  // для field_news_image
-          // 'body' => $body,        // для field_body (будет позже)
+          'date' => $date,
+          'summary' => $summary,
+          'image_url' => $fullData['image_url'],
+          'body' => $fullData['body'],
           'timestamp' => time(),
         ];
       }
     }
 
-    $this->log("Всего найдено новостей: " . count($news), 'INFO');
+    $this->log("Всего найдено новых новостей: " . count($news), 'INFO');
     return $news;
   }
+
+
+  /**
+   * Диагностический метод: сохраняет HTML страницы для анализа
+   */
+  private function debugPageStructure(string $donorUrl): void {
+    $html = $this->fetchHtml($donorUrl);
+    if ($html) {
+      $filename = '/tmp/debug_page_' . time() . '.html';
+      file_put_contents($filename, $html);
+      $this->log("Страница сохранена для анализа: " . $filename, 'DEBUG');
+
+      // Найдем все параграфы на странице
+      $dom = new \DOMDocument();
+      libxml_use_internal_errors(true);
+      $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+      libxml_clear_errors();
+      $xpath = new \DOMXPath($dom);
+      $paragraphs = $xpath->query("//p");
+      $this->log("Всего параграфов на странице: " . $paragraphs->length, 'DEBUG');
+
+      for ($i = 0; $i < min(5, $paragraphs->length); $i++) {
+        $text = trim($paragraphs->item($i)->nodeValue);
+        $this->log("Параграф $i: " . substr($text, 0, 100) . "...", 'DEBUG');
+      }
+    }
+  }
+
+  /**
+   * Получает полный текст новости и оригинальную картинку со страницы донора
+   */
+  private function fetchFullNewsData(string $donorUrl): array {
+
+    //$this->debugPageStructure($donorUrl);
+    $html = $this->fetchHtml($donorUrl);
+    if (!$html) {
+      $this->log("Не удалось получить содержимое страницы: " . $donorUrl, 'ERROR');
+      return ['body' => '', 'image_url' => ''];
+    }
+
+    $dom = new \DOMDocument();
+    libxml_use_internal_errors(true);
+    $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+
+    $xpath = new \DOMXPath($dom);
+
+    // === ПОЛУЧАЕМ КАРТИНКУ В ОРИГИНАЛЬНОМ КАЧЕСТВЕ ===
+    $imageUrl = '';
+    $imgNode = $xpath->query("//img[contains(@class, 'news-one-head-image')]");
+    if ($imgNode->length > 0) {
+      $src = $imgNode->item(0)->getAttribute('src');
+      if (!empty($src)) {
+        // Преобразуем относительную ссылку в абсолютную
+        if (strpos($src, 'http') !== 0) {
+          $baseUrl = 'https://xn--80acgfbsl1azdqr.xn--p1ai';
+          $src = rtrim($baseUrl, '/') . '/' . ltrim($src, '/');
+        }
+        $imageUrl = $src;
+      }
+    } else {
+      $this->log("Картинка с классом 'news-one-head-image' не найдена", 'WARNING');
+    }
+
+    // === ПОЛУЧАЕМ ТЕЛО НОВОСТИ ===
+    $bodyHtml = '';
+    // 1. Находим p class="news-one-announce"
+    $announceParagraph = $xpath->query("//p[contains(@class, 'news-one-announce')]");
+    if ($announceParagraph->length > 0) {
+      $bodyHtml .= $dom->saveHTML($announceParagraph->item(0));
+      $this->log("Найден анонс", 'INFO');
+    } else {
+      $this->log("Анонс не найден", 'WARNING');
+    }
+
+    // 2. Добавляем всё, что идёт после, до div class="row"
+    $currentNode = $announceParagraph->item(0);
+    $foundRow = false;
+    $collected = 0;
+
+    while ($currentNode = $currentNode->nextSibling) {
+      // Если встретили div с классом row - останавливаемся
+      if ($currentNode instanceof \DOMElement &&
+        strpos($currentNode->getAttribute('class'), 'row') !== false) {
+        $this->log("Достигнут стоп-элемент <div class='row'>, собрано элементов: " . $collected, 'INFO');
+        $foundRow = true;
+        break;
+      }
+
+      // Добавляем элемент если это параграф или другой нужный контент
+      if ($currentNode instanceof \DOMElement) {
+        $bodyHtml .= $dom->saveHTML($currentNode);
+        $collected++;
+      }
+    }
+
+    if (!$foundRow) {
+      $this->log("Стоп-элемент <div class='row'> не найден, собрано элементов: " . $collected, 'WARNING');
+    }
+
+    if (empty($bodyHtml)) {
+      $this->log("Текст новости не собран", 'ERROR');
+    } else {
+      $this->log("Успешно собран текст новости: " . strlen($bodyHtml) . " символов", 'INFO');
+    }
+
+
+    return [
+      'body' => $bodyHtml,
+      'image_url' => $imageUrl,
+    ];
+  }
+
 
   private function downloadAndSaveImage(string $imageUrl): ?int {
     try {
@@ -302,6 +403,13 @@ class NewsFetcher {
           'format' => 'basic_html',
         ]);
       }
+      // Поле: полный текст
+      if ($node->hasField('field_body') && !empty($newsItem['body'])) {
+        $node->set('field_body', [
+          'value' => $newsItem['body'],
+          'format' => 'full_html',
+        ]);
+      }
 
       // === ВОТ ЗДЕСЬ: СОХРАНЯЕМ ID КАРТИНКИ В ПОЛЕ ===
       if ($node->hasField('field_news_image') && $imageId) {
@@ -319,7 +427,11 @@ class NewsFetcher {
         $node->set('field_donor_url', $newsItem['donor_url']);
       }
 
+      //$node->path->pathauto = PathautoState::CREATE;
+
       $node->save();
+
+      \Drupal::service('pathauto.generator')->updateEntityAlias($node, 'bulkupdate');
 
       $this->log("Сохранена новость: " . $newsItem['title'] . " (ID: " . $node->id() . ")", 'INFO');
       return true;
@@ -385,7 +497,7 @@ class NewsFetcher {
     $this->log("Начало обновления новостей");
 
     // Загружаем HTML
-    $html = $this->fetchHtml();
+    $html = $this->fetchHtml($this->donorUrl);
     if ($html === null) {
       return false;
     }

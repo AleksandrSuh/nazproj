@@ -1,0 +1,15 @@
+{%
+  set classes = [
+  'all-news-gl',
+]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {% for row in rows %}
+    {% set node = row.content['#row']._entity %}
+    <article class="one-news-gl" id="drp_{{ node.id() }}">
+      <div class="date-news-gl">{{ node.field_news_date.value|date('d.m.Y') }}</div>
+      <a href="{{ path('entity.node.canonical', {'node': node.id()}) }}" class="name-news-gl">{{ node.label() }}</a>
+      <div class="anons-news-gl">{{ node.field_news_summary.value|striptags }}</div>
+    </article>
+  {% endfor %}
+</div>

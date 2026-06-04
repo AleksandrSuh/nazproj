@@ -44,88 +44,93 @@
       {{ page.header_chart }}
     </div>
     {% else %}
-    <div class='chart-zag'>
-      <div class='zag-str'>
-        {% if h1_title %}
-            <h1>{{ h1_title }}</h1>
-        {% endif %}
-      </div>
-      <div class="row">
-        {# { page.header_chart } #}
-        {% if total_budget_data is defined and total_budget_data is not empty %}
-        <div class="chart-gl">
-          <div class="top-chart">
-            <span class="line-chart need-bg"></span>
-            <div class="yars-chart">
-              {% for year, budget_items in total_budget_data %}
-                <span{% if curr_year == year %} class="active"{% endif %}>{{ year }}</span>
-              {% endfor %}
-            </div>
-          </div>
-          {% if total_budget_data is empty %}
-          {% else %}
-          {% for year, budget_items in total_budget_data %}
-          <div class="bottom-chart{% if curr_year != year %} null-chart{% else %} fadein active{% endif %}"{% if curr_year != year %} style="display: none;"{% endif %}>
-            <div class="all-block-chart">
-              <div class="charts-block">
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">{{ budget_items.summ.fedplan }}</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">{{ budget_items.summ.regplan }}</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-                <div class="one-chart">
-                  <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">{{ budget_items.summ.munplan }}</div></div>
-                  <div class="chart"><span></span></div>
-                </div>
-              </div>
-              <div class="info-carts">
-                <table cellspacing="0" class="table-info-carts">
-                  <tbody><tr>
-                    <th>Бюджет</th>
-                    <th>План <span>(млн ₽)</span></th>
-                    <th>Факт <span>(млн ₽)</span></th>
-                  </tr>
-                  <tr>
-                    <td>Федеральный</td>
-                    <td class="plan"><span></span>{{ budget_items.summ.fedplan }}</td>
-                    <td class="fakt"><span></span>{{ budget_items.summ.fedfakt }}</td>
-                  </tr>
-                  <tr>
-                    <td>Региональный</td>
-                    <td class="plan"><span></span>{{ budget_items.summ.regplan }}</td>
-                    <td class="fakt"><span></span>{{ budget_items.summ.regfakt }}</td>
-                  </tr>
-                  <tr>
-                    <td>Муниципальный</td>
-                    <td class="plan"><span></span>{{ budget_items.summ.munplan }}</td>
-                    <td class="fakt"><span></span>{{ budget_items.summ.munfakt }}</td>
-                  </tr>
-                  <tr>
-                    <td class="itog-chart">Итого</td>
-                    <td class="itog-plan">{{ budget_items.summ.iplan }}</td>
-                    <td class="itog-fakt">{{ budget_items.summ.ifakt }}</td>
-                  </tr>
-                  </tbody></table>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-          {% endif %}
-          {% else %}
-
+      {% if node.bundle() != 'news' %}
+      <div class='chart-zag'>
+        <div class='zag-str'>
+          {% if h1_title %}
+              <h1>{{ h1_title }}</h1>
           {% endif %}
         </div>
+        <div class="row">
+          {# { page.header_chart } #}
+          {% if total_budget_data is defined and total_budget_data is not empty %}
+          <div class="chart-gl">
+            <div class="top-chart">
+              <span class="line-chart need-bg"></span>
+              <div class="yars-chart">
+                {% for year, budget_items in total_budget_data %}
+                  <span{% if curr_year == year %} class="active"{% endif %}>{{ year }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            {% if total_budget_data is empty %}
+            {% else %}
+            {% for year, budget_items in total_budget_data %}
+            <div class="bottom-chart{% if curr_year != year %} null-chart{% else %} fadein active{% endif %}"{% if curr_year != year %} style="display: none;"{% endif %}>
+              <div class="all-block-chart">
+                <div class="charts-block">
+                  <div class="one-chart">
+                    <div class="name-meaning-chart"><div class="name-chart">Федеральный бюджет</div><div class="meaning-chart">{{ budget_items.summ.fedplan }}</div></div>
+                    <div class="chart"><span></span></div>
+                  </div>
+                  <div class="one-chart">
+                    <div class="name-meaning-chart"><div class="name-chart">Региональный бюджет</div><div class="meaning-chart">{{ budget_items.summ.regplan }}</div></div>
+                    <div class="chart"><span></span></div>
+                  </div>
+                  <div class="one-chart">
+                    <div class="name-meaning-chart"><div class="name-chart">Муниципальный бюджет</div><div class="meaning-chart">{{ budget_items.summ.munplan }}</div></div>
+                    <div class="chart"><span></span></div>
+                  </div>
+                </div>
+                <div class="info-carts">
+                  <table cellspacing="0" class="table-info-carts">
+                    <tbody><tr>
+                      <th>Бюджет</th>
+                      <th>План <span>(млн ₽)</span></th>
+                      <th>Факт <span>(млн ₽)</span></th>
+                    </tr>
+                    <tr>
+                      <td>Федеральный</td>
+                      <td class="plan"><span></span>{{ budget_items.summ.fedplan }}</td>
+                      <td class="fakt"><span></span>{{ budget_items.summ.fedfakt }}</td>
+                    </tr>
+                    <tr>
+                      <td>Региональный</td>
+                      <td class="plan"><span></span>{{ budget_items.summ.regplan }}</td>
+                      <td class="fakt"><span></span>{{ budget_items.summ.regfakt }}</td>
+                    </tr>
+                    <tr>
+                      <td>Муниципальный</td>
+                      <td class="plan"><span></span>{{ budget_items.summ.munplan }}</td>
+                      <td class="fakt"><span></span>{{ budget_items.summ.munfakt }}</td>
+                    </tr>
+                    <tr>
+                      <td class="itog-chart">Итого</td>
+                      <td class="itog-plan">{{ budget_items.summ.iplan }}</td>
+                      <td class="itog-fakt">{{ budget_items.summ.ifakt }}</td>
+                    </tr>
+                    </tbody></table>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% else %}
+
+            {% endif %}
+          </div>
+        </div>
       </div>
-    </div>
+      {% endif %}
     {% endif %}
   </div>
 </section>
    {% if not is_front %}
      {% if node %}
        <section class="telo-nac">
+       {% if node.bundle() == 'news' %}
+         <div class="zag-object"><h1>{{ node.label() }}</h1></div>
+       {% endif %}
        <div id="breadcrumbs">
          <a href="/" class="one-breadcrumbs">Главная</a>/
          {% if node.bundle() == 'razdel_napravleniya' %}
@@ -137,6 +142,9 @@
            <span class="one-breadcrumbs">{{ node.label }}</span>
          {% elseif node.bundle() == 'napravlenie' %}
            <span>{{ node.label }}</span>
+         {% elseif node.bundle() == 'news' %}
+           <a href="/news" class="one-breadcrumbs" title="Новости" itemprop="item">Новости</a>/
+           <span>{{ node.label }}</span>
          {% endif %}
        </div>
        </section>
@@ -145,110 +153,21 @@
    {% else %}
      {{ projects_front }}
    {% endif %}
-<!--section class='telo-nac'>
 
-  <article class='all-project-gl'>
-    <article class='one-project-gl' id='bx_1847241719_32'>
-      <a href='/infrastruktura-dlya-zhizni/'>
-        <span class='name-project-gl'>Инфраструктура для жизни</span>
-        <span class='anons-project-gl'>3 Региональных проекта</span>
-      </a>
-    </article>
-    <article class='one-project-gl' id='bx_1847241719_37'>
-      <a href='/molodyezh-i-deti/'>
-        <span class='name-project-gl'>Молодёжь и дети</span>
-        <span class='anons-project-gl'>2 Региональных проекта</span>
-      </a>
-    </article><article class='one-project-gl' id='bx_1847241719_38'>
-      <a href='/semya/'>
-        <span class='name-project-gl'>Семья</span>
-        <span class='anons-project-gl'>2 Региональных проекта</span>
-      </a>
-    </article>        			<article class='one-project-gl' style='background-color:#919191'>
-      <a href='/arch/'>
-        <span class='name-project-gl'>Нацпроекты 2020-2024</span>
-      </a>Внедрение интеллектуальных транспортных систем, предусматривающих автоматизацию процессов управления дорожным движением в городских агломерациях, включающих города с населением свыше 300 тысяч человек
-    </article>
-  </article>
-</section-->
 
+{% if is_front %}
 <section class='media-block'>
   <div class='telo-nac'>
     <div class='zag-but-block'>
       <div class='zag-news'><h2>Новости</h2></div>
       <a href='/news/' class='but-news'>Все новости</a>
     </div>
-    <article class='all-news-gl'>
-      <article class='one-news-gl' id="bx_3218110189_4918">
-        <div class='date-news-gl'>16.02.2024</div>
-        <a href='/news/ko_dnyu_zashchitnika_otechestva_na_donbass_otpravili_40_tonn_gumanitarnogo_gruza/' class='name-news-gl'>Ко Дню защитника Отечества на Донбасс отправили 40 тонн гуманитарного груза</a>
-        <div class='anons-news-gl'>Для уральцев были собраны теплые вещи, обувь, лекарства, продукты и разнообразная техника.</div>
-      </article>
-      <article class='one-news-gl' id="bx_3218110189_4916">
-        <div class='date-news-gl'>16.02.2024</div>
-        <a href='/news/za_dva_goda_kolichestvo_mnogodetnykh_semey_uvelichilos_na_2_5_tysyachi/' class='name-news-gl'>За два года количество многодетных семей увеличилось на 2,5 тысячи</a>
-        <div class='anons-news-gl'>Муниципалитет создает необходимую для семей инфраструктуру и наращивает нужную им материальную базу.</div>
-      </article>
-      <article class='one-news-gl' id="bx_3218110189_4917">
-        <div class='date-news-gl'>16.02.2024</div>
-        <a href='/news/spektakl_master_klass_marafon_kuda_poyti_v_vykhodnye/' class='name-news-gl'>Спектакль, мастер-класс, марафон - куда пойти в выходные?</a>
-        <div class='anons-news-gl'>Рассказываем, какие мероприятия ждут екатеринбуржцев в ближайшие дни.</div>
-      </article>
-      <article class='one-news-gl' id="bx_3218110189_4915">
-        <div class='date-news-gl'>16.02.2024</div>
-        <a href='/news/god_semi_ekaterinburg_bogat_pedagogicheskimi_dinastiyami/' class='name-news-gl'>Год семьи: Екатеринбург богат педагогическими династиями</a>
-        <div class='anons-news-gl'>Сразу несколько семей не менее трех поколений подряд обучают уральских школьников.</div>
-      </article>
-    </article>
+    {{ page.sidebar }}
   </div>
 </section>
 
-<section class='slider-glav-big'>
-  <div class='telo-nac'>
-    <div class='slider-gl'>
-      <article class='slider-track-gl'>
-        <a href="https://екатеринбург.рф/" class='slide-gl' id="bx_651765591_62">
-          <img
-            src="/upload/iblock/708/7089545a3d8c27b8ca496e96dd60c39c.jpg"
-            alt="Официальный портал Екатеринбурга"
-            title="Официальный портал Екатеринбурга"
-          />
-          <span class='name-slide-gl'>Официальный портал Екатеринбурга</span>
-        </a>		<a href="http://финансы.екатеринбург.рф/" class='slide-gl' id="bx_651765591_63">
-          <img
-            src="/upload/iblock/708/7089545a3d8c27b8ca496e96dd60c39c.jpg"
-            alt="Официальный портал Департамента финансов Екатеринбурга"
-            title="Официальный портал Департамента финансов Екатеринбурга"
-          />
-          <span class='name-slide-gl'>Официальный портал Департамента финансов Екатеринбурга</span>
-        </a>		<a href="https://pro-proekt.egov66.ru/" class='slide-gl' id="bx_651765591_839">
-          <img
-            src="/upload/iblock/ce8/fea6f33xb60btb0dq302rrx838lz97bo.png"
-            alt="Национальные проекты Свердловской области"
-            title="Национальные проекты Свердловской области"
-          />
-          <span class='name-slide-gl'>Национальные проекты Свердловской области</span>
-        </a>		<a href="https://xn--80aapampemcchfmo7a3c9ehj.xn--p1ai/" class='slide-gl' id="bx_651765591_65">
-          <img
-            src="/upload/iblock/ce8/fea6f33xb60btb0dq302rrx838lz97bo.png"
-            alt="Национальные проекты России"
-            title="Национальные проекты России"
-          />
-          <span class='name-slide-gl'>Национальные проекты России</span>
-        </a>		<a href="http://minfin.midural.ru/" class='slide-gl' id="bx_651765591_60">
-          <img
-            src="/upload/iblock/e9b/e9b5e8f76f78576960a70295e3a04a95.jpg"
-            alt="Министерство финансов Свердловской области"
-            title="Министерство финансов Свердловской области"
-          />
-          <span class='name-slide-gl'>Министерство финансов Свердловской области</span>
-        </a>		</article>
-    </div>
-  </div>
-  <div class='shadow-right'></div>
-  <div class='shadow-left'></div>
-</section>
-
+        {{ page.footer }}
+{% endif %}
 
 <footer>
   <div class='telo-nac'>

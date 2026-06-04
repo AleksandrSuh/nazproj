@@ -1,0 +1,24 @@
+<article class="news-detail">
+  <h1 class="news-detail__title">{{ node.title.value }}</h1>
+
+  <div class="news-detail__date">
+    {{ node.field_news_date.value|date('d.m.Y') }}
+  </div>
+
+  {% if node.field_news_image.entity %}
+    {% set image = node.field_news_image.entity %}
+    <div class="news-detail__image">
+      <img src="{{ file_url(image.uri.value) }}"
+           alt="{{ image.alt.value|default(node.title.value) }}"
+           title="{{ node.title.value }}">
+    </div>
+  {% endif %}
+
+  <div class="news-detail__content">
+    {{ node.body.value|raw }}
+  </div>
+
+  <div class="news-detail__back">
+    <a href="{{ path('custom_news.list') }}">← Назад к списку новостей</a>
+  </div>
+</article>
