@@ -1,0 +1,25 @@
+{#
+Шаблон для вывода направлений в шапке
+Доступные переменные:
+- view: объект представления
+- rows: массив строк с нодами (если нужно)
+- header, footer, pager и т.д.
+#}
+
+{% set directions = view.result %}
+
+{% if directions %}
+  <nav class='menu-f'>
+    <ul class="f-nav custom">
+
+    {% for direction in directions %}
+      {% set node = direction._entity %}
+      {% set title = node.label() %}
+      {% set url = path('entity.node.canonical', {'node': node.id()}) %}
+      {% set img_src = file_url(node.field_img.entity.fileuri) %}
+
+      <li><a href="{{ url }}">{{ title }}</a></li>
+    {% endfor %}
+    </ul>
+  </nav>
+{% endif %}

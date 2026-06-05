@@ -172,23 +172,13 @@
 <footer>
   <div class='telo-nac'>
     <div class='top-footer'>
-      <nav class='menu-f'>
 
-        <ul class="f-nav custom">
+      {{ projects_footer }}
 
-          <li><a href="/demografiya/">Демография</a></li>
-          <li><a href="/kultura/">Культура</a></li>
-          <li><a href="/zhile-i-gorodskaya-sreda/">Жилье и городская среда</a></li>
-          <li><a href="/ekologiya/">Экология</a></li>
-          <li><a href="/bezopasnye-kachestvennye-dorogi/">Безопасные качественные дороги</a></li>
-          <li><a href="/obrazovanie/">Образование</a></li>
-          <li><a href="/turizm-i-industriya-gostepriimstva/">Туризм и индустрия гостеприимства</a></li>
-
-        </ul>
-      </nav>
       <div class='chb-version' style="display: none;">Версия для слабовидящих</div>
     </div>
-    <div class='bot-footer'>Департамент финансов Администрации города Екатеринбурга © 2014-2022</div>
+    {% set last_year = 'now'|date('Y') %}
+    <div class='bot-footer'>Департамент финансов Администрации города Екатеринбурга © 2014-{{ last_year }}</div>
   </div>
 </footer>
 

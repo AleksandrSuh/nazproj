@@ -17,6 +17,7 @@ function nazpro_theme_preprocess_html(array &$variables) {
 function nazpro_theme_preprocess_page(&$variables) {
   // Подготавливаем представление для шапки (block_1)
   $variables['projects_header'] = views_embed_view('projects', 'block_1');
+  $variables['projects_footer'] = views_embed_view('projects_footer', 'block_1');
 
   // Подготавливаем представление для главной (block_2) - только для главной страницы
   if (\Drupal::service('path.matcher')->isFrontPage()) {
