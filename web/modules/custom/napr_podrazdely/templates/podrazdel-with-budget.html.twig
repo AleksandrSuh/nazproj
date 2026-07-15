@@ -5,9 +5,22 @@
         {% if budget_data is empty %}
           <p>Нет мероприятий с бюджетными данными</p>
         {% else %}
-          {% for year, budget_items in budget_data %}
-          <span{% if curr_year == year %} class="active"{% endif %}>{{ year }}</span>
-          {% endfor %}
+          {% set active_found = false %}
+          {% if curr_year in budget_data|keys %}
+            {% set active_found = true %}
+            {% for year, budget_items in budget_data %}
+              <span{% if curr_year == year %} class="active"{% endif %}>
+                  {{ year }}
+              </span>
+            {% endfor %}
+          {% else %}
+            {# Год не найден — последнему добавляем active #}
+            {% for year, budget_items in budget_data %}
+              <span{% if loop.last %} class="active"{% endif %}>
+                  {{ year }}
+              </span>
+            {% endfor %}
+          {% endif %}
         {% endif %}
       </div>
     </div>
@@ -15,7 +28,7 @@
       {% if budget_data is empty %}
       {% else %}
         {% for year, budget_items in budget_data %}
-          <div class="bottom-chart-cart null-chart" style="{% if curr_year != year %}display: none; {% endif %}width: 533px;">
+          <div class="bottom-chart-cart null-chart" style="{% if (active_found and curr_year != year) or (not active_found and not loop.last) %}display: none; {% endif %}width: 533px;">
             <div class="all-block-chart">
               <div class="charts-block-cart">
                 <div class="one-chart">

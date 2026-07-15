@@ -80,11 +80,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!slider) return;
 
     const slides = slider.querySelectorAll('.swiper-slide');
-
+    var check = false,
+      last = 0;
     slides.forEach((slide, index) => {
       const span = slide.querySelector('span');
+      last = index;
       if (span && parseInt(span.textContent.trim()) === currentYear) {
-
+        check = true;
         span.click();
 
         // Вариант Б: Если нужно переключить слайд в Swiper
@@ -95,6 +97,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
       }
     });
+    if(!check)
+    {
+      slides.item(last).querySelector('span').click();
+    }
     //console.log('год:', currentYear);
     //console.log('слайдов:', slides.length);
   }, 500);

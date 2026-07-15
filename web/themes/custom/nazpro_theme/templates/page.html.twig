@@ -58,8 +58,14 @@
             <div class="top-chart">
               <span class="line-chart need-bg"></span>
               <div class="yars-chart">
+                {% set active_found = false %}
                 {% for year, budget_items in total_budget_data %}
-                  <span{% if curr_year == year %} class="active"{% endif %}>{{ year }}</span>
+                  {% if curr_year == year %}
+                    {% set active_found = true %}
+                  {% endif %}
+                {% endfor %}
+                {% for year, budget_items in total_budget_data %}
+                  <span{% if curr_year == year or (not active_found and loop.last) %} class="active"{% endif %}>{{ year }}</span>
                 {% endfor %}
               </div>
             </div>
