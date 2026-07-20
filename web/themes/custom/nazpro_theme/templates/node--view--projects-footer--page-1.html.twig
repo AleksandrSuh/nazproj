@@ -1,0 +1,13 @@
+{#
+Шаблон для вывода направлений архива
+Доступные переменные:
+- view: объект представления
+- rows: массив строк с нодами (если нужно)
+- header, footer, pager и т.д.
+#}
+<article class='one-project-gl'>
+  <a href='{{ url }}'>
+    <span class='name-project-gl'>{{ label }}</span>
+    <!--span class='anons-project-gl'>{{ direction.podrazdely_count }} Региональных проекта</span-->
+  </a>
+</article>

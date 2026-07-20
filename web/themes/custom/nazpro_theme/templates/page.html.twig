@@ -44,7 +44,8 @@
       {{ page.header_chart }}
     </div>
     {% else %}
-      {% if node.bundle() != 'news' %}
+      {# {node.bundle() } #}
+      {% if node.bundle() != 'news' and node.bundle() != 'page' %}
       <div class='chart-zag'>
         <div class='zag-str'>
           {% if h1_title %}
@@ -137,6 +138,7 @@
        {% if node.bundle() == 'news' %}
          <div class="zag-object"><h1>{{ node.label() }}</h1></div>
        {% endif %}
+       {% if node.bundle() != 'page' %}
        <div id="breadcrumbs">
          <a href="/" class="one-breadcrumbs">Главная</a>/
          {% if node.bundle() == 'razdel_napravleniya' %}
@@ -153,6 +155,7 @@
            <span>{{ node.label }}</span>
          {% endif %}
        </div>
+       {% endif %}
        </section>
      {% endif %}
      {{ page.content }}

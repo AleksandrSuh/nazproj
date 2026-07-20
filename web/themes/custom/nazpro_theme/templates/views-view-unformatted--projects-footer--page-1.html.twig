@@ -1,0 +1,12 @@
+{#
+Шаблон для неформатированного списка представления
+rows — массив со всеми записями
+#}
+
+<section class="telo-nac">
+  <article class="all-project-gl">
+    {% for row in rows %}
+      {{ row.content }}
+    {% endfor %}
+  </article>
+</section>
