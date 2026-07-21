@@ -6,8 +6,10 @@
           {{ processed_body|raw }}
         </div>
         <div class='buts-news'>
-
-          <!--a href="/news/spektakl_master_klass_marafon_kuda_poyti_v_vykhodnye/">Предыдущая новость</a-->
+          {{ attach_library('custom_news_navigation/news-navigation') }}
+          {% if news_navigation_html %}
+            {{ news_navigation_html }}
+          {% endif %}
         </div>
       </div>
       <div class='oic-news-vn'>

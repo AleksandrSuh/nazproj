@@ -1,0 +1,8 @@
+name: Межновостная навигация
+type: module
+description: 'Добавляет навигацию между новостями (предыдущая/следующая)'
+package: Custom
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:node
+  - drupal:taxonomy

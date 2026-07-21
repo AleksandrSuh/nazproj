@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * @file
+ * Модуль навигации по новостям.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function custom_news_navigation_theme($existing, $type, $theme, $path) {
+  // \Drupal::logger('custom_news_navigation')->notice('Hook theme called');
+
+  return [
+    'news_navigation' => [
+      'variables' => [
+        'previous_node' => NULL,
+        'next_node' => NULL,
+        'current_node' => NULL,
+      ],
+      'template' => 'news-navigation',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node templates.
+ */
+function custom_news_navigation_preprocess_node(&$variables) {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['node'];
+
+  // Проверяем, что это тип 'news'.
+  if ($node->bundle() === 'news') {
+    /** @var \Drupal\custom_news_navigation\Service\NewsNavigationService $service */
+    $service = \Drupal::service('custom_news_navigation.navigation_service');
+    $adjacent = $service->getAdjacentNews($node);
+
+    // Создаем render array для навигации.
+    $variables['news_navigation_html'] = [
+      '#theme' => 'news_navigation',
+      '#previous_node' => $adjacent['previous'],
+      '#next_node' => $adjacent['next'],
+      '#current_node' => $node,
+    ];
+  }
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function custom_news_navigation_entity_insert(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'node' && $entity->bundle() === 'news') {
+    /** @var \Drupal\custom_news_navigation\Service\NewsNavigationService $service */
+    $service = \Drupal::service('custom_news_navigation.navigation_service');
+    $service->invalidateCache();
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function custom_news_navigation_entity_update(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'node' && $entity->bundle() === 'news') {
+    /** @var \Drupal\custom_news_navigation\Service\NewsNavigationService $service */
+    $service = \Drupal::service('custom_news_navigation.navigation_service');
+    $service->invalidateCache();
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function custom_news_navigation_entity_delete(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'node' && $entity->bundle() === 'news') {
+    /** @var \Drupal\custom_news_navigation\Service\NewsNavigationService $service */
+    $service = \Drupal::service('custom_news_navigation.navigation_service');
+    $service->invalidateCache();
+  }
+}

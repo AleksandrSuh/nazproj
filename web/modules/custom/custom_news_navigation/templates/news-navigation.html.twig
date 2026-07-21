@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ * Шаблон навигации между новостями.
+ *
+ * Доступные переменные:
+ * - previous_node: узел предыдущей новости или NULL
+ * - next_node: узел следующей новости или NULL
+ * - current_node: текущий узел
+ */
+#}
+
+{% if previous_node or next_node %}
+      {% if previous_node %}
+          <a href="{{ path('entity.node.canonical', {'node': previous_node.id}) }}"
+             rel="prev"
+             aria-label="Предыдущая новость: {{ previous_node.label }}">Предыдущая новость</a>
+      {% endif %}
+      {% if next_node %}
+          <a href="{{ path('entity.node.canonical', {'node': next_node.id}) }}"
+             rel="next"
+             aria-label="Следующая новость: {{ next_node.label }}">Следующая новость</a>
+      {% endif %}
+{% endif %}

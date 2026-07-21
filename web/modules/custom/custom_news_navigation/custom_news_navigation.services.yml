@@ -1,0 +1,7 @@
+services:
+  custom_news_navigation.navigation_service:
+    class: Drupal\custom_news_navigation\Service\NewsNavigationService
+    arguments:
+      - '@database'
+      - '@entity_type.manager'
+      - '@cache.default'
