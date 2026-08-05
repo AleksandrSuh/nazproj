@@ -73,6 +73,7 @@ function nazpro_theme_preprocess_page(&$variables) {
             $arYearsData[$arData['year']]['data'][] = $arData;
           }
         }
+        ksort($arYearsData);
         foreach ($arYearsData as $year => $arYData)
         {
           $arSumm = [
