@@ -53,6 +53,7 @@ class BudgetDataController extends ControllerBase {
     // Строим запрос
     $query = $this->database->select('budget', 'b')
       ->fields('b', [
+        'id',
         'year',
         'category_code',
         'dop_fk',
@@ -75,9 +76,10 @@ class BudgetDataController extends ControllerBase {
     }
 
     // Добавляем сортировку
+    $query->orderBy('id');
     $query->orderBy('year', 'DESC');
-    $query->orderBy('category_code', 'ASC');
-    $query->orderBy('dop_fk', 'ASC');
+    //$query->orderBy('category_code', 'ASC');
+    //$query->orderBy('dop_fk', 'ASC');
 
     // Добавляем пагинацию (по 50 записей на страницу)
     $pager = $query->extend(PagerSelectExtender::class)->limit(50);
@@ -185,6 +187,7 @@ class BudgetDataController extends ControllerBase {
    */
   private function buildTableHeader() {
     return [
+      $this->t('ID'),
       $this->t('Год'),
       $this->t('КЦСР'),
       $this->t('Доп. ФК'),
@@ -219,6 +222,7 @@ class BudgetDataController extends ControllerBase {
     foreach ($results as $row) {
       $rows[] = [
         'data' => [
+          $row->id,
           $row->year,
           $row->category_code,
           $row->dop_fk,
