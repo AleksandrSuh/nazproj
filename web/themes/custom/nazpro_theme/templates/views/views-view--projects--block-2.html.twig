@@ -23,8 +23,9 @@
       </article>
     {% endfor %}
     {% set last_year = 'now'|date('Y') - 1 %}
-    {% set last_titl = 'Нацпроекты 2020-' ~ last_year %}
-      <article class='one-project-gl'>
+    {# % set last_titl = 'Нацпроекты 2020-' ~ last_year % #}
+    {% set last_titl = 'Нацпроекты 2020-2024' %}
+      <article class='one-project-gl' style="background-color:#919191">
         <a href='/arch'>
           <span class='name-project-gl'>{{ last_titl }}</span>
           <span class='anons-project-gl'> </span>
