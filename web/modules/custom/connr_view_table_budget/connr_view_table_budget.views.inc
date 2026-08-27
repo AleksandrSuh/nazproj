@@ -59,6 +59,137 @@ function connr_view_table_budget_views_data() {
     'sort' => ['id' => 'standard'],
   ];
 
+  $data['budget']['extence_plan'] = [
+    'title' => t('Extence plan'),
+    'help' => t('Общий план расходов'),
+    'field' => [
+      'id' => 'numeric',
+      'click sortable' => TRUE,
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+
+// План по федеральному бюджету
+  $data['budget']['extence_fed_plan'] = [
+    'title' => t('Extence fed plan'),
+    'help' => t('План расходов по федеральному бюджету'),
+    'field' => [
+      'id' => 'numeric',
+      'click sortable' => TRUE,
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+
+// План по региональному бюджету
+  $data['budget']['extence_reg_plan'] = [
+    'title' => t('Extence reg plan'),
+    'help' => t('План расходов по региональному бюджету'),
+    'field' => [
+      'id' => 'numeric',
+      'click sortable' => TRUE,
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+
+// План по муниципальному бюджету
+  $data['budget']['extence_mun_plan'] = [
+    'title' => t('Extence mun plan'),
+    'help' => t('План расходов по муниципальному бюджету'),
+    'field' => [
+      'id' => 'numeric',
+      'click sortable' => TRUE,
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+
+// ============================================
+// ФАКТ (FACT)
+// ============================================
+
+// Общий факт (доходы)
+  $data['budget']['income_fact'] = [
+    'title' => t('Income fact'),
+    'help' => t('Общий факт доходов'),
+    'field' => [
+      'id' => 'numeric',
+      'click sortable' => TRUE,
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+
+// Факт по федеральному бюджету
+  $data['budget']['income_fed_fact'] = [
+    'title' => t('Income fed fact'),
+    'help' => t('Факт доходов по федеральному бюджету'),
+    'field' => [
+      'id' => 'numeric',
+      'click sortable' => TRUE,
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+
+// Факт по региональному бюджету
+  $data['budget']['income_reg_fact'] = [
+    'title' => t('Income reg fact'),
+    'help' => t('Факт доходов по региональному бюджету'),
+    'field' => [
+      'id' => 'numeric',
+      'click sortable' => TRUE,
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+
+// Факт по муниципальному бюджету
+  $data['budget']['income_mun_fact'] = [
+    'title' => t('Income mun fact'),
+    'help' => t('Факт доходов по муниципальному бюджету'),
+    'field' => [
+      'id' => 'numeric',
+      'click sortable' => TRUE,
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+
   // Вспомогательное поле для красивого отображения в выпадающем списке
   // (склеиваем category_code + dop_fk + year)
   $data['budget']['display_title'] = [
