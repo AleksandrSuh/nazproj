@@ -44,36 +44,6 @@ class BudgetService {
         'status' => 1,
       ]);
     return self::DataCalc($meropriyatiya);
-    /*$result = [];
-
-    foreach ($meropriyatiya as $meropr) {
-      $meropr_id = $meropr->id();
-      $budget_ids_field = $meropr->get('field_budget_ids')->value;
-
-      if (empty($budget_ids_field)) {
-        $result[$meropr_id] = [];
-        continue;
-      }
-
-      // 2. Разбираем строку с ID через запятую
-      $budget_ids = array_map('trim', explode(',', $budget_ids_field));
-
-      // 3. Загружаем строки из таблицы budget
-      $query = $this->database->select('budget', 'b')
-        ->fields('b')
-        ->condition('id', $budget_ids, 'IN');
-      $budget_rows = $query->execute()->fetchAllAssoc('id');
-
-
-      // 4. Формируем структуру $arMeropr[мероприятие][id_бюджета][данные]
-      foreach ($budget_ids as $budget_id) {
-        if (isset($budget_rows[$budget_id])) {
-          $result[$meropr_id][$budget_id] = $budget_rows[$budget_id];
-        }
-      }
-    }
-
-    return $result;*/
   }
 
   private function DataCalc($meropriyatiya)
@@ -97,7 +67,8 @@ class BudgetService {
       // 3. Загружаем строки из таблицы budget
       $query = $this->database->select('budget', 'b')
         ->fields('b')
-        ->condition('id', $budget_ids, 'IN');
+        ->condition('id', $budget_ids, 'IN')
+        ->condition('active', 1);
       $budget_rows = $query->execute()->fetchAllAssoc('id');
 
 

@@ -222,6 +222,19 @@ class ImportXlsxForm extends FormBase {
       throw new \Exception('Не удалось определить годы в файле');
     }
 
+    $years = [$year_1, $year_2, $year_3];
+
+    // Собираем ключи всех строк, которые есть в файле (для всех трёх лет).
+    // Ключ — "category_code|dop_fk|year".
+    $file_keys = [];
+    foreach ($new_array as $row) {
+      $cc = trim((string) $row[0]);
+      $fk = trim((string) $row[1]);
+      foreach ($years as $y) {
+        $file_keys[$cc . '|' . $fk . '|' . $y] = TRUE;
+      }
+    }
+
     $database = \Drupal::database();
     $current_user_id = \Drupal::currentUser()->id();
     $current_time = date('Y-m-d H:i:s');
@@ -231,10 +244,11 @@ class ImportXlsxForm extends FormBase {
     try {
       $count_updated = 0;
       $count_inserted = 0;
+      $count_deactivated = 0;
 
       foreach ($new_array as $row) {
-        $category_code = trim($row[0]);
-        $dop_fk = trim($row[1]);
+        $category_code = trim((string) $row[0]);
+        $dop_fk = trim((string) $row[1]);
 
         // Данные для трёх годов
         $years_data = [
@@ -283,7 +297,9 @@ class ImportXlsxForm extends FormBase {
             ->fetchField();
 
           if ($existing) {
-            // Обновляем существующую запись
+            // Обновляем существующую запись.
+            // xml_id НЕ трогаем — сохраняем историческое значение.
+            // active = 1 — строка есть в файле, значит актуальна.
             $database->update('budget')
               ->fields([
                 'extence_plan' => $values['extence_plan'],
@@ -294,6 +310,7 @@ class ImportXlsxForm extends FormBase {
                 'income_fed_fact' => $values['income_fed_fact'],
                 'income_reg_fact' => $values['income_reg_fact'],
                 'income_mun_fact' => $values['income_mun_fact'],
+                'active' => 1,
                 'updated_at' => $current_time,
                 'uid' => $current_user_id,
               ])
@@ -301,13 +318,15 @@ class ImportXlsxForm extends FormBase {
               ->execute();
             $count_updated++;
           } else {
-            // Создаём новую запись
+            // Создаём новую запись.
+            // xml_id = 0 — маркер «нет значения» (колонка NOT NULL).
             $database->insert('budget')
               ->fields([
                 'category_code' => $category_code,
                 'dop_fk' => $dop_fk,
                 'year' => $year,
-                'xml_id' => time(),
+                'xml_id' => 0,
+                'active' => 1,
                 'extence_plan' => $values['extence_plan'],
                 'extence_fed_plan' => $values['extence_fed_plan'],
                 'extence_reg_plan' => $values['extence_reg_plan'],
@@ -322,27 +341,54 @@ class ImportXlsxForm extends FormBase {
               ->execute();
             $count_inserted++;
           }
-          /*\Drupal::logger('budget_import')->notice(
-            'Импорт  @inserted',
-            ['@inserted' => $category_code. ' ' .$dop_fk. ' ' .$year. ' ' .$row[2]. ' ' .$values['income_fact']]
-          );*/
         }
-
-        //break;  пробуем одну строку
       }
 
-      // Если всё успешно, транзакция автоматически закоммитится при выходе из блока try
+      // --- Soft-delete: деактивируем строки, которых нет в файле, ---
+      // --- но только в пределах трёх лет из файла. ---
+      $deactivated_ids = [];
 
-      /*
-      \Drupal::logger('budget_import')->notice(
-        'Импорт завершён: обновлено @updated, добавлено @inserted',
-        ['@updated' => $count_updated, '@inserted' => $count_inserted]
-      );*/
+      $existing_active = $database->select('budget', 'b')
+        ->fields('b', ['id', 'category_code', 'dop_fk', 'year'])
+        ->condition('year', $years, 'IN')
+        ->condition('active', 1)
+        ->execute()
+        ->fetchAll();
 
+      foreach ($existing_active as $r) {
+        $key = trim((string) $r->category_code) . '|'
+          . trim((string) $r->dop_fk) . '|'
+          . $r->year;
+        if (!isset($file_keys[$key])) {
+          $database->update('budget')
+            ->fields([
+              'active' => 0,
+              'updated_at' => $current_time,
+              'uid' => $current_user_id,
+            ])
+            ->condition('id', $r->id)
+            ->execute();
+          $deactivated_ids[] = $r->id;
+          $count_deactivated++;
+        }
+      }
+
+      if ($count_deactivated > 0) {
+        \Drupal::logger('budget_import')->notice(
+          'Импорт: деактивировано @count строк(и). ID: @ids',
+          [
+            '@count' => $count_deactivated,
+            '@ids' => implode(', ', $deactivated_ids),
+          ]
+        );
+      }
+
+      // Сообщение пользователю
       $this->messenger()->addStatus(
-        $this->t('Импорт завершён. Обновлено записей: @updated, добавлено: @inserted', [
+        $this->t('Импорт завершён. Обновлено: @updated, добавлено: @inserted, деактивировано: @deactivated', [
           '@updated' => $count_updated,
           '@inserted' => $count_inserted,
+          '@deactivated' => $count_deactivated,
         ])
       );
 
