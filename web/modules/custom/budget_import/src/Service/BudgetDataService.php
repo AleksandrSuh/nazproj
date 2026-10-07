@@ -25,16 +25,63 @@ class BudgetDataService {
         ];
       }
       $categories[$row->category]['years'][$row->year] = (float) $row->amount;*/
+      // расход - это "факт", ассигнования - это "план"
       $year = $row->year;
-      $fed_plan[$year] = ($fed_plan[$year] ?? 0) + $row->extence_fed_plan;
-      $reg_plan[$year] = ($reg_plan[$year] ?? 0) + $row->extence_reg_plan;
-      $mun_plan[$year] = ($mun_plan[$year] ?? 0) + $row->extence_mun_plan;
-      $plan[$year] = ($plan[$year] ?? 0) + $row->extence_plan;
-      $fed_fact[$year] = ($fed_fact[$year] ?? 0) + $row->income_fed_fact;
-      $reg_fact[$year] = ($reg_fact[$year] ?? 0) + $row->income_reg_fact;
-      $mun_fact[$year] = ($mun_fact[$year] ?? 0) + $row->income_mun_fact;
-      $fact[$year] = ($fact[$year] ?? 0) + $row->income_fact;
+      $DOP_FK_TMP = $row->dop_fk;
+      $check_digit = mb_substr($DOP_FK_TMP, 0, 1);
+      $RASHOD_PO_LS_FED_TMP = $row->income_fed_fact;
+      $RASHOD_PO_LS_REG_TMP = $row->income_reg_fact;
+      $RASHOD_PO_LS_MYN_TMP = $row->income_mun_fact;
+      $RASHOD_PO_LS_TMP = $row->income_fact;
+      $ASS_FED_TMP = $row->extence_fed_plan;
+      $ASS_REG_TMP = $row->extence_reg_plan;
+      $ASS_MYN_TMP = $row->extence_mun_plan;
+      $ASS_TMP = $row->extence_plan;
+
+      if ($RASHOD_PO_LS_FED_TMP == 0 && $RASHOD_PO_LS_REG_TMP == 0 && $RASHOD_PO_LS_MYN_TMP == 0)
+      {
+        //if($year==$god)
+        if ($check_digit == 8)
+        {
+          $RASHOD_PO_LS_FED_TMP=$RASHOD_PO_LS_TMP;
+        }
+        elseif ($check_digit == 6 || $check_digit == 9)
+        {
+          $RASHOD_PO_LS_REG_TMP = $RASHOD_PO_LS_TMP;
+        }
+        else
+        {
+          $RASHOD_PO_LS_MYN_TMP = $RASHOD_PO_LS_TMP;
+        }
+      }
+      if ($ASS_FED_TMP == 0 && $ASS_REG_TMP == 0 && $ASS_MYN_TMP == 0)
+      {
+        if ($check_digit == 8)
+        {
+          $ASS_FED_TMP = $ASS_TMP;
+        }
+        elseif ($check_digit == 6 || $check_digit == 9)
+        {
+          $ASS_REG_TMP = $ASS_TMP;
+        }
+        else
+        {
+          $ASS_MYN_TMP = $ASS_TMP;
+        }
+      }
+
+      $fed_plan[$year] = ($fed_plan[$year] ?? 0) + $ASS_FED_TMP;
+      $reg_plan[$year] = ($reg_plan[$year] ?? 0) + $ASS_REG_TMP;
+      $mun_plan[$year] = ($mun_plan[$year] ?? 0) + $ASS_MYN_TMP;
+      $plan[$year] = ($plan[$year] ?? 0) + $ASS_TMP;
+      $fed_fact[$year] = ($fed_fact[$year] ?? 0) + $RASHOD_PO_LS_FED_TMP;
+      $reg_fact[$year] = ($reg_fact[$year] ?? 0) + $RASHOD_PO_LS_REG_TMP;
+      $mun_fact[$year] = ($mun_fact[$year] ?? 0) + $RASHOD_PO_LS_MYN_TMP;
+      $fact[$year] = ($fact[$year] ?? 0) + $RASHOD_PO_LS_TMP;
+
     }
+
+
     foreach ($fed_plan as $year => $summ)
     {
       $fpl = $this->getNormsizer($summ);
