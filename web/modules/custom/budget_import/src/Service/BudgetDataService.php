@@ -18,14 +18,7 @@ class BudgetDataService {
     $arYearsData = [];
     $fed_plan = $reg_plan = $mun_plan = $fed_fact = $reg_fact = $mun_fact = $plan = $fact = [];
     foreach ($results as $row) {
-      /*if (!isset($categories[$row->category])) {
-        $categories[$row->category] = [
-          'category' => $row->category,
-          'years' => []
-        ];
-      }
-      $categories[$row->category]['years'][$row->year] = (float) $row->amount;*/
-      // расход - это "факт", ассигнования - это "план"
+      // расход - это "факт", ассигнования - "план"
       $year = $row->year;
       $DOP_FK_TMP = $row->dop_fk;
       $check_digit = mb_substr($DOP_FK_TMP, 0, 1);
@@ -112,18 +105,6 @@ class BudgetDataService {
 
     return $arYearsData;
 
-    /*if($type_page == 'all')
-    {
-      $arTypes = ['incomes','expenses'];
-      foreach ($arTypes as $type)
-      {
-        $data[$type.'Data'] = $this->getBudgetDataForType($type);
-      }
-    }
-    else
-    {
-      $data = $this->getBudgetDataForType($type_page);
-    }*/
   }
 
   private function getNormsizer($size) {
