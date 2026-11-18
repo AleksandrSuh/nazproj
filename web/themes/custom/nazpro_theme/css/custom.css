@@ -79,3 +79,49 @@ img {
 .sorting-block {
   margin-top: 30px;
 }
+
+/* Форма входа /user/login: центрируем блок и делаем поля удобнее */
+#user-login-form {
+  max-width: 420px;
+  margin: 30px auto 50px;
+}
+
+#user-login-form .form-item {
+  margin: 0 0 18px;
+}
+
+#user-login-form label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+#user-login-form .form-text {
+  display: block;
+  width: 100%;
+  height: 44px;
+  padding: 10px 14px;
+  font-size: 16px;
+  border: 1px solid #C6C6C6;
+  border-radius: 4px;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+#user-login-form .form-text:focus {
+  border-color: #014A6C;
+}
+
+#user-login-form .form-submit {
+  width: 100%;
+  height: 44px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #94468b;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#user-login-form .form-submit:hover {
+  background-color: #944699;
+}
